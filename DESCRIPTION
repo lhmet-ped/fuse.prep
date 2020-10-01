@@ -1,12 +1,12 @@
 Package: fuse.prep
-Title: What the Package Does (One Line, Title Case)
+Title: Preparation Of Input Data For Fuse
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Jônatan",
            family = "Tatsch",
            role = c("aut", "cre"),
            email = "lhmet@ufsm.br")
-Description: What the package does (one paragraph).
+Description: Data tidyng of forcing time series and elevation bands for FUSE.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to
     pick a license
 Encoding: UTF-8
