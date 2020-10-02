@@ -115,6 +115,8 @@ spatial_clim <- function(meteo_brick = import_nc(varnc = "prec", dest_dir = "inp
                          dest_dir = "output",
                          ref_crs = "+proj=longlat +datum=WGS84") {
 
+  # meteo_brick = b_prec; poly_station = poly74; ref_crs = "+proj=longlat +datum=WGS84"
+
   is_extent <- "Extent" %in% class(poly_station)
 
   if(!is_extent) {
@@ -123,13 +125,13 @@ spatial_clim <- function(meteo_brick = import_nc(varnc = "prec", dest_dir = "inp
 
   cb <- raster::crop(meteo_brick, poly_station)
   ann_summary <- annual_summary(cb, fun)
-  clim_summary <- mean(ann_summary, na.rm = TRUE)
+  clim_summary <- raster::mean(ann_summary, na.rm = TRUE)
 
   if(is_extent) return(clim_summary)
 
   #plot(clim_summary)
 
-  clim_summary <- raster::mask(clim_summary, poly_station)
+  clim_summary <- raster::mask(clim_summary, sf::as_Spatial(poly_station))
   clim_summary
 }
 
