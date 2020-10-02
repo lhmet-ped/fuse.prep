@@ -114,6 +114,8 @@ annual_summary <- function(meteo_brick, fun){
 #'@inheritParams spatial_average
 #' @param fun function to apply. Default: sum.
 #' @param ref_crs character, coordinate reference system.
+#' @return \code{\link[raster]{raster}} with the Mean annual climatology of
+#' meteorological field.
 #' @export
 annual_climatology <- function(meteo_brick = import_nc(varnc = "prec", dest_dir = "input"),
                          poly_station,
