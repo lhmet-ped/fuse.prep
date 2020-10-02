@@ -1,13 +1,5 @@
 utils::globalVariables(
-  c(#"fim_hist",
-    #"inic_hist",
-    #"jus", "modif",
-    #"num",
-    #"posto",
-    #"ree",
-    #"ssis",
-    #"unzip",
-    #"v_inic",
+  c(
     "qnat_posto",
     "codONS",
     "info",
