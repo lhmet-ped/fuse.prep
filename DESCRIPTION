@@ -15,3 +15,13 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 URL: https://github.com/lhmet-ped/fuse.prep
 BugReports: https://github.com/lhmet-ped/fuse.prep/issues
+Imports: 
+    checkmate,
+    raster,
+    dplyr,
+    tibble,
+    magrittr
+Suggests: 
+    testthat
+Depends: 
+    R (>= 2.10)
