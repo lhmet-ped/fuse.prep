@@ -7,8 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "lhmet@ufsm.br")
 Description: Data tidyng of forcing time series and elevation bands for FUSE.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
@@ -21,7 +20,14 @@ Imports:
     dplyr,
     tibble,
     magrittr,
-    stringr
+    stringr,
+    HEgis,
+    ncdf4,
+    stats,
+    graphics,
+    utils,
+    lubridate,
+    sf
 Suggests: 
     testthat
 Depends: 

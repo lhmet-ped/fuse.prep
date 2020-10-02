@@ -16,9 +16,10 @@
 
 #-----------------------------------------------------------------------------
 #' Save data from a ONS station in a RDS file
-save_data <- function(data_posto = qnat_posto,
+#'@noRd
+save_data <- function(data_posto,# = qnat_posto,
                       .prefix = "qnat-obs-posto-",
-                      .posto_id = info_posto$posto[1],
+                      .posto_id,# = info_posto$posto[1],
                       .dest_dir = "output"){
 
   data_posto_file <- paste0(.prefix, .posto_id, ".RDS")
@@ -42,7 +43,7 @@ save_data <- function(data_posto = qnat_posto,
   }
 
   # use local file for tests
-  if(HEobs:::.check_user()){
+  if(.check_user()){
     local_paths <- c(
       prec = file.path(
         "~/Dropbox/datasets/climate_datasets/superficie",
@@ -66,24 +67,24 @@ save_data <- function(data_posto = qnat_posto,
 
 .down_nc <- function(varnc = c("prec", "et0"), dest_dir = "input") {
 
-  assert_path_for_output(dest_dir, overwrite = TRUE)
+  checkmate::assert_path_for_output(dest_dir, overwrite = TRUE)
 
   # dropbox links
   lnks <- .find_nc(local = FALSE)
   lnk_nc <- lnks[varnc]
 
   # output nc
-  nc_fname <- unlist(str_split(basename(lnk_nc), "\\?"))[c(TRUE, FALSE)]
+  nc_fname <- unlist(stringr::str_split(basename(lnk_nc), "\\?"))[c(TRUE, FALSE)]
   dest_file <- file.path(dest_dir, nc_fname)
 
   # downloading
   for(i in seq_along(dest_file)){
     # i = 1
     message("\ndownlonding file: ", basename(nc_fname[i]), "\n")
-    download.file(lnk_nc[i], destfile = dest_file[i], mode = "wb")
+    utils::download.file(lnk_nc[i], destfile = dest_file[i], mode = "wb")
   }
 
-  assert_file_exists(dest_file)
+  checkmate::assert_file_exists(dest_file)
 
   dest_file
 }
@@ -95,7 +96,7 @@ save_data <- function(data_posto = qnat_posto,
 #' @param dest_dir a character with the name of where the downloaded file is
 #' saved. Default: `fusepoc-prep/input`.
 #'
-#' @return
+#' @return character, path to NetCDF file.
 #' @export
 #'
 #' @examples
@@ -114,7 +115,7 @@ meteo_nc <- function(varnc, dest_dir  = "input") {
   }
 
   # use local data to avoid download 2 files of 1.5 GB
-  if(HEobs:::.check_user()){
+  if(.check_user()){
     local_paths <- .find_nc(local = TRUE)
     path_nc <- local_paths[varnc]
     return(path_nc)
@@ -166,21 +167,21 @@ import_nc <- function(varnc = c("prec", "et0"), dest_dir = "input"){
 f <- function(info_posto,
               nc_name = "elev_bands.nc",
               nb = 5,
-              xy = coords_posto,
+              xy, # = coords_posto,
               long_name = "A long name"
 ) {
-  x <- ncdim_def(
+  x <- ncdf4::ncdim_def(
     name = 'latitude',
     units = 'degreesN',
     vals = xy[["longitude"]]
   )
-  y <- ncdim_def(
+  y <- ncdf4::ncdim_def(
     name = 'longitude',
     units = 'degreesE',
     vals = xy[["longitude"]]
   )
 
-  z_bands <- ncdim_def(
+  z_bands <- ncdf4::ncdim_def(
     name = 'elevation_band',
     units = '-',
     vals = as.numeric(1 : nb)

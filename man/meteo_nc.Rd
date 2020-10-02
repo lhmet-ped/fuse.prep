@@ -13,7 +13,7 @@ meteo_nc(varnc, dest_dir = "input")
 saved. Default: \code{fusepoc-prep/input}.}
 }
 \value{
-
+character, path to NetCDF file.
 }
 \description{
 Download NetCDF files of daily gridded precipitation and evapotranspiration

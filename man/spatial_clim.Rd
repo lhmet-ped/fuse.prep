@@ -6,14 +6,22 @@
 \usage{
 spatial_clim(
   meteo_brick = import_nc(varnc = "prec", dest_dir = "input"),
-  poly_station = poly_posto,
+  poly_station,
   fun = sum,
-  save = TRUE,
-  dest_dir = "output",
   ref_crs = "+proj=longlat +datum=WGS84"
 )
+}
+\arguments{
+\item{meteo_brick}{\code{\link[raster]{brick}} of meteorological field
+(e.g.: precipitation, evapotranspiration, etc).}
+
+\item{poly_station}{object of class \code{\link[sf]{sf}} and geometry
+type polygon of station catchment.}
+
+\item{fun}{function to apply. Default: sum.}
+
+\item{ref_crs}{character, coordinate reference system.}
 }
 \description{
 Annual Mean Climatology
 }
-\keyword{Internal}

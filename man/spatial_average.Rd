@@ -5,12 +5,16 @@
 \title{Save average precipitation or evapotranspiration over upstream drainage
 area of a ONS station}
 \usage{
-spatial_average(meteo_brick, posto_poly, save = TRUE, dest_dir = "output")
+spatial_average(meteo_brick, poly_station, fun = mean)
 }
 \arguments{
-\item{meteo_brick}{object of class \code{\link[brick]{raster}}}
+\item{meteo_brick}{\code{\link[raster]{brick}} of meteorological field
+(e.g.: precipitation, evapotranspiration, etc).}
 
-\item{posto_poly}{bject of class \code{\link[sf]{sf}}}
+\item{poly_station}{object of class \code{\link[sf]{sf}} and geometry
+type polygon of station catchment.}
+
+\item{fun}{function to apply. Default: mean.}
 }
 \value{
 a character path to the RDS file with a \code{\link[tibble]{tibble}}

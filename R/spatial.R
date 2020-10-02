@@ -25,23 +25,27 @@
 #' Save average precipitation or evapotranspiration over upstream drainage
 #' area of a ONS station
 #'
-#' @param meteo_brick object of class \code{\link[brick]{raster}}
-#' @param posto_poly bject of class \code{\link[sf]{sf}}
+#' @param meteo_brick \code{\link[raster]{brick}} of meteorological field
+#' (e.g.: precipitation, evapotranspiration, etc).
+#' @param poly_station object of class \code{\link[sf]{sf}} and geometry
+#' type polygon of station catchment.
+#' @param fun function to apply. Default: mean.
 #'
 #' @return a character path to the RDS file with a \code{\link[tibble]{tibble}}
 #' @export
 #'
 spatial_average <- function(meteo_brick,
-                            posto_poly,
-                            save = TRUE,
-                            dest_dir = "output"
+                            poly_station,
+                            fun = mean
+                            #save = TRUE,
+                            #dest_dir = "output"
                             ){
 
-  assert_set_equal(c(class(meteo_brick)), "RasterBrick")
+  checkmate::assert_set_equal(c(class(meteo_brick)), "RasterBrick")
   #plot(posto_poly)
   #plot(poly_posto, add = TRUE, bg = 2)
-  posto_poly_b <- HEgis::prep_poly_posto(posto_poly)
-  rm(posto_poly)
+  posto_poly_b <- HEgis::prep_poly_posto(poly_station)
+  rm(poly_station)
   cb <- raster::crop(meteo_brick, posto_poly_b)
 
   # need improvement
@@ -56,7 +60,7 @@ spatial_average <- function(meteo_brick,
     posto_poly_b,
     weights = TRUE,
     normalizeWeights = TRUE,
-    fun = mean
+    fun
   )))
   # plot(prec_avg, type = "h")
   # range(prec_avg)
@@ -65,7 +69,7 @@ spatial_average <- function(meteo_brick,
                               posto = as.integer(posto_poly_b$codONS),
                               meteovar = meteo_avg
   )
-  meteo_tbl <- setNames(meteo_tbl, c("date", "posto", varnc_guess))
+  meteo_tbl <- stats::setNames(meteo_tbl, c("date", "posto", varnc_guess))
 
 
   #meteo_posto_file <- paste0(gsub("meteo", varnc_guess, "meteo-posto-"),
@@ -77,27 +81,27 @@ spatial_average <- function(meteo_brick,
   # checkmate::assert_file_exists(meteo_posto_file)
   # meteo_posto_file
 
-  if(save){
-    save_data(
-      data_posto = meteo_tbl,
-      .prefix = gsub("meteo", varnc_guess, "meteo-posto-"),
-      .posto_id = posto_poly_b$codONS[1],
-      .dest_dir = dest_dir
-    )
-  }
+  # if(save){
+  #   save_data(
+  #     data_posto = meteo_tbl,
+  #     .prefix = gsub("meteo", varnc_guess, "meteo-posto-"),
+  #     .posto_id = posto_poly_b$codONS[1],
+  #     .dest_dir = dest_dir
+  #   )
+  # }
   meteo_tbl
 }
 
 #-------------------------------------------------------------------------------
 #' Summarize a brick by year
-#' @noRd
-annual_summary <- function(b, fun){
+#'@inheritParams spatial_average
+annual_summary <- function(meteo_brick, fun){
 
-  zdates <- raster::getZ(b)
+  zdates <- raster::getZ(meteo_brick)
   checkmate::assert_class(zdates, "Date")
 
-  ann_summary <- stackApply(
-    x = b,
+  ann_summary <- raster::stackApply(
+    x = meteo_brick,
     indices = lubridate::year(zdates),
     fun,
     na.rm = TRUE
@@ -107,12 +111,14 @@ annual_summary <- function(b, fun){
 
 
 #' Annual Mean Climatology
-#' @keywords Internal
+#'@inheritParams spatial_average
+#' @param fun function to apply. Default: sum.
+#' @param ref_crs character, coordinate reference system.
 spatial_clim <- function(meteo_brick = import_nc(varnc = "prec", dest_dir = "input"),
-                         poly_station = poly_posto,
+                         poly_station,
                          fun = sum,
-                         save = TRUE,
-                         dest_dir = "output",
+                         #save = TRUE,
+                         #dest_dir = "output",
                          ref_crs = "+proj=longlat +datum=WGS84") {
 
   # meteo_brick = b_prec; poly_station = poly74; ref_crs = "+proj=longlat +datum=WGS84"
@@ -120,7 +126,9 @@ spatial_clim <- function(meteo_brick = import_nc(varnc = "prec", dest_dir = "inp
   is_extent <- "Extent" %in% class(poly_station)
 
   if(!is_extent) {
-    poly_station <- sf::st_transform(poly_station, ref_crs)
+    checkmate::assert_true(sf::st_is(poly_station, "POLYGON"))
+    if(is.null(ref_crs)) ref_crs <- raster::projection(meteo_brick)
+    poly_station <- sf::st_transform(poly_station, as.character(ref_crs))
   }
 
   cb <- raster::crop(meteo_brick, poly_station)

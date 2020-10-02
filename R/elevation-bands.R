@@ -56,7 +56,7 @@ z_bands <- function(z, dz = 100, nbands = NULL){
   brks <- seq(zrange[1], zrange[2], by = dz)
   if(max(brks) < zrange[2]) brks <- c(brks, brks[length(brks)] + dz)
   #discrete_dist <- table(cut(z, brks, include.lowest = TRUE))
-  dist <- hist(x = z, breaks = brks, plot = FALSE)
+  dist <- graphics::hist(x = z, breaks = brks, plot = FALSE)
   ftab <- .hist2tab(dist) %>%
     dplyr::select(band, dplyr::everything())
   ftab
