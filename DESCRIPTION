@@ -20,7 +20,8 @@ Imports:
     raster,
     dplyr,
     tibble,
-    magrittr
+    magrittr,
+    stringr
 Suggests: 
     testthat
 Depends: 

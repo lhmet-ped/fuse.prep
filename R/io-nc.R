@@ -61,7 +61,7 @@ save_data <- function(data_posto = qnat_posto,
 }
 
 .nc_name <- function(varnc){
-  unlist(str_split(basename(.find_nc(FALSE)[varnc]), "\\?"))[c(TRUE, FALSE)]
+  unlist(stringr::str_split(basename(.find_nc(FALSE)[varnc]), "\\?"))[c(TRUE, FALSE)]
 }
 
 .down_nc <- function(varnc = c("prec", "et0"), dest_dir = "input") {
@@ -99,9 +99,12 @@ save_data <- function(data_posto = qnat_posto,
 #' @export
 #'
 #' @examples
+#' if(FALSE){
+#'  meteo_nc("prec")
+#' }
 meteo_nc <- function(varnc, dest_dir  = "input") {
 
-  assert_subset(varnc, c("prec", "et0"))
+  checkmate::assert_subset(varnc, c("prec", "et0"))
 
   # check data download before in the input directory
   nc_previous <- file.path(dest_dir, .nc_name(varnc))
@@ -132,6 +135,8 @@ meteo_nc <- function(varnc, dest_dir  = "input") {
 #' @references https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.4518
 #' @return a character path to the NetCDF file downloaded.
 #' @export
+#' @examples
+#' if(FALSE) b_prec <- fuse.prep::import_nc(varnc = "prec", dest_dir = "input")
 #'
 import_nc <- function(varnc = c("prec", "et0"), dest_dir = "input"){
   # varnc = "et0"
@@ -143,7 +148,7 @@ import_nc <- function(varnc = c("prec", "et0"), dest_dir = "input"){
   b <- raster::brick(nc_file)
   # não altere o nome do arquivo netcdf, as datas sao extraídas do nome do arquivo
   b_dates <- b %>%
-    filename() %>%
+    raster::filename() %>%
     basename() %>%
     stringr::str_extract_all("[0-9]{8}") %>%
     unlist() %>%
