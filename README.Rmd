@@ -1,0 +1,64 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# fuse.prep
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of **`{fuse.prep}`** is to prepare the input data for the Framework for Understanding Structural Errors ([FUSE](https://naddor.github.io/fuse/)).
+
+
+
+## Installation
+
+You can install the development version of **{`fuse.prep`}** from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("lhmet-ped/fuse.prep")
+```
+
+
+## Dados
+
+This is a basic example which shows you how to create the elevation bands NetCDF file.
+
+Os dados de exemplo necessários são disponibilizados com os pacotes **`{HEgis}`** (`poly74` e `condem74`) e **`{fuse.prep}`** (`precclim74`):
+
+- polígono da bacia hidrográfica do posto do ONS (Simple Feature, `sf`)
+
+- os dados de elevação do terreno (`raster`) hidrologicamente condicionados
+
+- precipitação climatológica anual (`raster`)
+
+
+```{r data}
+library(fuse.prep)
+library(HEgis)
+poly74
+condem74
+precclim74
+```
+
+# Bandas de elevação 
+
+https://github.com/naddor/tofu/blob/master/input_output_settings/create_elev_bands_nc.R
+
+```{r}
+elev_tab_format <- elev_bands(con_dem = condem74, meteo_raster = precclim74, dz = 100)
+elev_tab_format
+```
+

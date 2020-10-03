@@ -84,11 +84,13 @@ z_bands <- function(z, dz = 100, nbands = NULL){
 #' @family elevation bands functions
 #' @seealso \code{\link[raster]{cut}}, \code{\link[raster]{resample}},
 #' \code{\link[raster]{zonal}}
-elev_bands <- function(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL){
+elev_bands <- function(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL) {
   # con_dem = condem74; meteo_raster = precclim74; dz = 100; nbands = NULL
   bands <- z_bands(z = con_dem, dz, nbands)
 
-  if(is.null(meteo_raster)) return(bands)
+  if (is.null(meteo_raster)) {
+    return(bands)
+  }
 
   brks <- c(bands$inf, bands$sup[nrow(bands)]) %>%
     unique() %>%
@@ -101,15 +103,25 @@ elev_bands <- function(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL){
 
   # plot(prec_clim_res); plot(st_geometry(poly_station), add = TRUE)
   zone_frac <- raster::zonal(prec_res,
-                             rbands,
-                             fun = "sum"
+    rbands,
+    fun = "sum"
   ) %>%
     tibble::as_tibble() %>%
-    dplyr::rename('band' = zone, 'prec_frac' = sum) %>%
-    dplyr::mutate(prec_frac = prec_frac/sum(prec_frac))
-  #sum(zone_frac$frac_prec)
+    dplyr::rename("band" = zone, "prec_frac" = sum) %>%
+    dplyr::mutate(prec_frac = prec_frac / sum(prec_frac))
+
+  checkmate::assert(
+    abs(sum(zone_frac$area_frac) - 1) > 1E-6,
+    abs(sum(zone_frac$prec_frac) - 1) > 1E-6
+  )
+
+  # sum(zone_frac$frac_prec)
   zone_frac <- dplyr::full_join(zone_frac, bands, by = "band") %>%
-    dplyr::select(band, inf, sup, mean_elev, count, area_frac, prec_frac)
+    dplyr::select(band, inf, sup, mean_elev, area_frac, prec_frac)
   zone_frac
 }
+
+
+
+#------------------------------------------------------------------------------
 
