@@ -81,27 +81,31 @@ Tabela com frações de área da bacia hidrográfica e da precipitação por
 banda de elevação.
 
 ``` r
-elev_tab_format <- elev_bands(con_dem = condem74, meteo_raster = precclim74, dz = 100)
+elev_tab_format <- elev_bands(con_dem = condem74, meteo_raster = precclim74, nbands = 14)
 #>   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================================                  |  75%  |                                                                              |======================================================================| 100%
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_tab_format
-#> # A tibble: 10 x 6
-#>     zone   inf   sup mean_elev   area_frac prec_frac
-#>    <dbl> <dbl> <dbl>     <dbl>       <dbl>     <dbl>
-#>  1     1   588   688       638 0.000276    0.0000591
-#>  2     2   688   788       738 0.133       0.135    
-#>  3     3   788   888       838 0.394       0.389    
-#>  4     4   888   988       938 0.259       0.255    
-#>  5     5   988  1088      1038 0.104       0.109    
-#>  6     6  1088  1188      1138 0.0789      0.0819   
-#>  7     7  1188  1288      1238 0.0284      0.0266   
-#>  8     8  1288  1388      1338 0.00330     0.00296  
-#>  9     9  1388  1488      1438 0.000104    0.0000155
-#> 10    10  1488  1588      1538 0.000000765 0
+#> # A tibble: 14 x 6
+#>     zone   inf   sup mean_elev area_frac prec_frac
+#>    <dbl> <dbl> <dbl>     <dbl>     <dbl>     <dbl>
+#>  1     1  588   654.      621. 0.000195  0.0000403
+#>  2     2  654.  719.      686. 0.00367   0.00416  
+#>  3     3  719.  785.      752. 0.113     0.115    
+#>  4     4  785.  850.      818. 0.277     0.275    
+#>  5     5  850.  916.      883. 0.236     0.230    
+#>  6     6  916.  981.      949. 0.147     0.146    
+#>  7     7  981. 1047      1014. 0.0717    0.0752   
+#>  8     8 1047  1113.     1080. 0.0632    0.0671   
+#>  9     9 1113. 1178.     1145. 0.0507    0.0523   
+#> 10    10 1178. 1244.     1211. 0.0271    0.0263   
+#> 11    11 1244. 1309.     1276. 0.00842   0.00730  
+#> 12    12 1309. 1375.     1342. 0.00177   0.00163  
+#> 13    13 1375. 1440.     1408. 0.000146  0.0000318
+#> 14    14 1440. 1506      1473. 0.0000150 0
 ```
 
-Escrita do arquivo NetCDF de bandas de elevação.
+Centróides da bacia hidrográfica
 
 ``` r
 # lon  e lat do centróide do polígono
@@ -113,12 +117,16 @@ plot(ll_74, add = TRUE)
 #> Warning in plot.sf(ll_74, add = TRUE): ignoring all but the first attribute
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+<img src="man/figures/README-centroides-1.png" width="100%" />
 
 ``` r
 lon_74 <- st_coordinates(ll_74)[[1]]
 lat_74 <- st_coordinates(ll_74)[[2]]
-  
+```
+
+Escrita do arquivo NetCDF de bandas de elevação.
+
+``` r
 elev_bands_file_nc <- elev_bands_nc(
   elev_tab = elev_tab_format,
   lon = lon_74,
@@ -127,7 +135,7 @@ elev_bands_file_nc <- elev_bands_nc(
   na = -9999
 )
 elev_bands_file_nc
-#> [1] "/tmp/Rtmpse5fV8/elevation_bands_74.nc"
+#> [1] "/tmp/RtmpZbkOdN/elevation_bands_74.nc"
 file.exists(elev_bands_file_nc)
 #> [1] TRUE
 ```
@@ -135,27 +143,30 @@ file.exists(elev_bands_file_nc)
 Verificação do arquivo gerado.
 
 ``` r
-#if (requireNamespace("tidync", quietly = TRUE)) {
+if (requireNamespace("tidync", quietly = TRUE)) {
   library(tidync)
   out <- tidync(elev_bands_file_nc) %>% hyper_tibble()
   # compara arquivo de exemplo do FUSE
   ref <- tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_elev_bands.nc") %>% hyper_tibble()
-  
-#}
+}
 out
-#> # A tibble: 10 x 6
-#>      area_frac mean_elev prec_frac longitude latitude elevation_band
-#>          <dbl>     <dbl>     <dbl>     <dbl>    <dbl>          <dbl>
-#>  1 0.000276          638 0.0000591     -50.3    -26.0              1
-#>  2 0.133             738 0.135         -50.3    -26.0              2
-#>  3 0.394             838 0.389         -50.3    -26.0              3
-#>  4 0.259             938 0.255         -50.3    -26.0              4
-#>  5 0.104            1038 0.109         -50.3    -26.0              5
-#>  6 0.0789           1138 0.0819        -50.3    -26.0              6
-#>  7 0.0284           1238 0.0266        -50.3    -26.0              7
-#>  8 0.00330          1338 0.00296       -50.3    -26.0              8
-#>  9 0.000104         1438 0.0000155     -50.3    -26.0              9
-#> 10 0.000000765      1538 0             -50.3    -26.0             10
+#> # A tibble: 14 x 6
+#>    area_frac mean_elev prec_frac longitude latitude elevation_band
+#>        <dbl>     <dbl>     <dbl>     <dbl>    <dbl>          <dbl>
+#>  1 0.000195       621. 0.0000403     -50.3    -26.0              1
+#>  2 0.00367        686. 0.00416       -50.3    -26.0              2
+#>  3 0.113          752. 0.115         -50.3    -26.0              3
+#>  4 0.277          818. 0.275         -50.3    -26.0              4
+#>  5 0.236          883. 0.230         -50.3    -26.0              5
+#>  6 0.147          949. 0.146         -50.3    -26.0              6
+#>  7 0.0717        1014. 0.0752        -50.3    -26.0              7
+#>  8 0.0632        1080. 0.0671        -50.3    -26.0              8
+#>  9 0.0507        1145. 0.0523        -50.3    -26.0              9
+#> 10 0.0271        1211. 0.0263        -50.3    -26.0             10
+#> 11 0.00842       1276. 0.00730       -50.3    -26.0             11
+#> 12 0.00177       1342. 0.00163       -50.3    -26.0             12
+#> 13 0.000146      1408. 0.0000318     -50.3    -26.0             13
+#> 14 0.0000150     1473. 0             -50.3    -26.0             14
 ```
 
 ``` r

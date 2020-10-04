@@ -61,13 +61,14 @@ Tabela com frações de área da bacia hidrográfica e da precipitação por ban
 elevação.
 
 ```{r}
-elev_tab_format <- elev_bands(con_dem = condem74, meteo_raster = precclim74, dz = 100)
+elev_tab_format <- elev_bands(con_dem = condem74, meteo_raster = precclim74, nbands = 14)
 elev_tab_format
 ```
 
-Escrita do arquivo NetCDF de bandas de elevação. 
+Centróides da bacia hidrográfica
 
-```{r}
+
+```{r centroides}
 # lon  e lat do centróide do polígono
 library(sf)
 ll_74 <- suppressWarnings(st_centroid(poly74))
@@ -75,7 +76,11 @@ plot(st_geometry(poly74))
 plot(ll_74, add = TRUE)
 lon_74 <- st_coordinates(ll_74)[[1]]
 lat_74 <- st_coordinates(ll_74)[[2]]
-  
+```
+
+Escrita do arquivo NetCDF de bandas de elevação. 
+
+```{r elv_nc}
 elev_bands_file_nc <- elev_bands_nc(
   elev_tab = elev_tab_format,
   lon = lon_74,
@@ -87,16 +92,16 @@ elev_bands_file_nc
 file.exists(elev_bands_file_nc)
 ```
 
+
 Verificação do arquivo gerado.
 
 ```{r}
-#if (requireNamespace("tidync", quietly = TRUE)) {
+if (requireNamespace("tidync", quietly = TRUE)) {
   library(tidync)
   out <- tidync(elev_bands_file_nc) %>% hyper_tibble()
   # compara arquivo de exemplo do FUSE
   ref <- tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_elev_bands.nc") %>% hyper_tibble()
-  
-#}
+}
 out
 ```
 ```{r}
