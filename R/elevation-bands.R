@@ -182,119 +182,57 @@ elev_bands_nc <- function(elev_tab,
   )
 
   # define dimensions
-  dim_elev_bands <- ncdf4::ncdim_def(
-    name = "elevation_band",
-    units = "-",
-    vals = sort(elev_tab_format$zone)
-  )
-
-  dim_lon <- ncdf4::ncdim_def(
-    name = "longitude",
-    units = "degreesE",
-    vals = ccoords[["lon"]]
-  )
-
-  dim_lat <- ncdf4::ncdim_def(
-    name = "latitude",
-    units = "degreesN",
-    vals = ccoords[["lat"]]
-  )
-
-  dim_list <- list(dim_lon, dim_lat, dim_elev_bands)
-
-  # dim_atts <- tibble::tibble(
-  #   name = c("longitude", "latitude", "elevation_band"),
-  #   units = c("degreesE", "degreesN", "-"),
-  #   vals = list(
-  #     ccoords[["lon"]],
-  #     ccoords[["lat"]],
-  #     sort(elev_tab_format[["zone"]])
-  #   )
-  # ) %>%
-  #   purrr::pmap(., ncdf4::ncdim_def)
+  dim_atts <- tibble::tibble(
+    name = c("longitude", "latitude", "elevation_band"),
+    units = c("degreesE", "degreesN", "-"),
+    vals = list(
+      ccoords[["lon"]],
+      ccoords[["lat"]],
+      sort(elev_tab_format[["zone"]])
+    )
+  ) %>%
+    purrr::pmap(., ncdf4::ncdim_def)
 
   ## names(dim_atts) <- c("dim_lon", "dim_lat", "dim_elev_bands")
 
-  ## all.equal(dim_atts,dim_list)
-
-
   # define variables
-  area_frac_nc <- ncdf4::ncvar_def(
-    name = "area_frac",
-    units = "-",
-    dim = dim_list,
-    missval = na,
-    longname = "Fraction of the catchment covered by each elevation band"
+  long_names <- c(
+    "Fraction of the catchment covered by each elevation band",
+    "Mid-point elevation of each elevation band",
+    "Fraction of catchment precipitation that falls on each elevation band"
   )
-  mean_elev_nc <- ncdf4::ncvar_def(
-    name = "mean_elev",
-    units = "m asl",
-    dim = dim_list,
-    missval = na,
-    longname = "Mid-point elevation of each elevation band"
-  )
+  names(long_names) <- var_names
 
-  prec_frac_nc <- ncdf4::ncvar_def(
-    name = "prec_frac",
-    units = "-",
-    dim = dim_list,
-    missval = na,
-    longname = "Fraction of catchment precipitation that falls on each elevation band"
-  )
-
-
-
-  # long_names <- c(
-  #   "Fraction of the catchment covered by each elevation band",
-  #   "Mid-point elevation of each elevation band",
-  #   "Fraction of catchment precipitation that falls on each elevation band"
-  # )
-  # names(long_names) <- var_names
-  #
-  # vars_atts_l <- tibble::tibble(
-  #   name = names(long_names),
-  #   units = c("-", "m asl", "-"),
-  #   dim = lapply(1:length(name), function(i) dim_atts),
-  #   missval = rep(na, length(name)),
-  #   longname = long_names
-  # ) %>%
-  #   purrr::pmap(ncdf4::ncvar_def)
-
-  ## vars_list <- list(area_frac_nc, mean_elev_nc, prec_frac_nc)
-  ## all.equal(vars_atts, vars_list)
-
+  vars_atts_l <- tibble::tibble(
+    name = names(long_names),
+    units = c("-", "m asl", "-"),
+    dim = lapply(1:length(name), function(i) dim_atts),
+    missval = rep(na, length(name)),
+    longname = long_names
+  ) %>%
+    purrr::pmap(ncdf4::ncvar_def)
 
  # open nc
   nc_conn <- ncdf4::nc_create(
-    file_nc,
-    list(area_frac_nc,mean_elev_nc,prec_frac_nc)
+    filename = file_nc,
+    vars = vars_atts_l,
+    force_v4
   )
 
-  # nc_conn <- ncdf4::nc_create(
-  #   filename = file_nc,
-  #   vars = vars_atts,
-  #   force_v4
-  # )
-
   # write variables to file
-  ncdf4::ncvar_put(nc_conn, area_frac_nc, vals = elev_tab_format$area_frac)
-  ncdf4::ncvar_put(nc_conn, mean_elev_nc, vals = elev_tab_format$mean_elev)
-  ncdf4::ncvar_put(nc_conn, prec_frac_nc, vals = elev_tab_format$prec_frac)
-
-
-  # lapply(
-  #   var_names,
-  #   function(ivar) {
-  #     # ivar = "prec_frac"
-  #     vars_att_sel <- vars_atts_l[[which(unlist(map(vars_atts_l, "name")) == ivar)]]
-  #     #all.equal(vars_att_sel, prec_frac_nc)
-  #     ncdf4::ncvar_put(
-  #       nc = nc_conn,
-  #       varid = vars_att_sel,
-  #       vals = elev_tab_format[[ivar]]
-  #     )
-  #   }
-  # )
+  lapply(
+    var_names,
+    function(ivar) {
+      # ivar = "prec_frac"
+      vars_att_sel <- vars_atts_l[[which(unlist(purrr::map(vars_atts_l, "name")) == ivar)]]
+      #all.equal(vars_att_sel, prec_frac_nc)
+      ncdf4::ncvar_put(
+        nc = nc_conn,
+        varid = vars_att_sel,
+        vals = elev_tab_format[[ivar]]
+      )
+    }
+  )
 
   ncdf4::nc_close(nc_conn)
   checkmate::assert_file_exists(file_nc)
