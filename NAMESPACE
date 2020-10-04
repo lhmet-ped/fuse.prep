@@ -3,6 +3,7 @@
 export("%>%")
 export(annual_climatology)
 export(elev_bands)
+export(elev_bands_nc)
 export(import_nc)
 export(meteo_nc)
 export(spatial_average)
