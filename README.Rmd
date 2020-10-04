@@ -32,7 +32,7 @@ devtools::install_github("lhmet-ped/fuse.prep")
 ```
 
 
-## Dados
+## Data
 
 This is a basic example which shows you how to create the elevation bands NetCDF file.
 
@@ -53,12 +53,62 @@ condem74
 precclim74
 ```
 
-# Bandas de elevação 
+Para saber como gerar estes 3 arquivos veja a vinheta do pacote.
 
-https://github.com/naddor/tofu/blob/master/input_output_settings/create_elev_bands_nc.R
+## Arquivo NetCDF de bandas de elevação 
+
+Tabela com frações de área da bacia hidrográfica e da precipitação por banda de
+elevação.
 
 ```{r}
 elev_tab_format <- elev_bands(con_dem = condem74, meteo_raster = precclim74, dz = 100)
 elev_tab_format
 ```
+
+Escrita do arquivo NetCDF de bandas de elevação. 
+
+```{r}
+# lon  e lat do centróide do polígono
+library(sf)
+ll_74 <- suppressWarnings(st_centroid(poly74))
+plot(st_geometry(poly74))
+plot(ll_74, add = TRUE)
+lon_74 <- st_coordinates(ll_74)[[1]]
+lat_74 <- st_coordinates(ll_74)[[2]]
+  
+elev_bands_file_nc <- elev_bands_nc(
+  elev_tab = elev_tab_format,
+  lon = lon_74,
+  lat = lat_74,
+  file_nc = file.path(tempdir(), "elevation_bands_74.nc"),
+  na = -9999
+)
+elev_bands_file_nc
+file.exists(elev_bands_file_nc)
+```
+
+Verificação do arquivo gerado.
+
+```{r}
+#if (requireNamespace("tidync", quietly = TRUE)) {
+  library(tidync)
+  out <- tidync(elev_bands_file_nc) %>% hyper_tibble()
+  # compara arquivo de exemplo do FUSE
+  ref <- tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_elev_bands.nc") %>% hyper_tibble()
+  
+#}
+out
+```
+```{r}
+ref
+```
+
+
+
+
+
+## Arquivo NetCDF de forçantes meteorológicas
+
+
+https://github.com/naddor/tofu/blob/master/input_output_settings/write_forcing.R
 

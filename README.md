@@ -21,7 +21,7 @@ You can install the development version of **{`fuse.prep`}** from
 devtools::install_github("lhmet-ped/fuse.prep")
 ```
 
-## Dados
+## Data
 
 This is a basic example which shows you how to create the elevation
 bands NetCDF file.
@@ -73,19 +73,21 @@ precclim74
 #> values     : 1449.61, 2070.507  (min, max)
 ```
 
-# Bandas de elevação
+Para saber como gerar estes 3 arquivos veja a vinheta do pacote.
 
-<https://github.com/naddor/tofu/blob/master/input_output_settings/create_elev_bands_nc.R>
+## Arquivo NetCDF de bandas de elevação
+
+Tabela com frações de área da bacia hidrográfica e da precipitação por
+banda de elevação.
 
 ``` r
 elev_tab_format <- elev_bands(con_dem = condem74, meteo_raster = precclim74, dz = 100)
 #>   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================================                  |  75%  |                                                                              |======================================================================| 100%
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
-#> Warning: Unknown or uninitialised column: `area_frac`.
 elev_tab_format
 #> # A tibble: 10 x 6
-#>     band   inf   sup mean_elev   area_frac prec_frac
+#>     zone   inf   sup mean_elev   area_frac prec_frac
 #>    <dbl> <dbl> <dbl>     <dbl>       <dbl>     <dbl>
 #>  1     1   588   688       638 0.000276    0.0000591
 #>  2     2   688   788       738 0.133       0.135    
@@ -98,3 +100,85 @@ elev_tab_format
 #>  9     9  1388  1488      1438 0.000104    0.0000155
 #> 10    10  1488  1588      1538 0.000000765 0
 ```
+
+Escrita do arquivo NetCDF de bandas de elevação.
+
+``` r
+# lon  e lat do centróide do polígono
+library(sf)
+#> Linking to GEOS 3.8.0, GDAL 3.0.4, PROJ 6.3.1
+ll_74 <- suppressWarnings(st_centroid(poly74))
+plot(st_geometry(poly74))
+plot(ll_74, add = TRUE)
+#> Warning in plot.sf(ll_74, add = TRUE): ignoring all but the first attribute
+```
+
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+
+``` r
+lon_74 <- st_coordinates(ll_74)[[1]]
+lat_74 <- st_coordinates(ll_74)[[2]]
+  
+elev_bands_file_nc <- elev_bands_nc(
+  elev_tab = elev_tab_format,
+  lon = lon_74,
+  lat = lat_74,
+  file_nc = file.path(tempdir(), "elevation_bands_74.nc"),
+  na = -9999
+)
+elev_bands_file_nc
+#> [1] "/tmp/Rtmpse5fV8/elevation_bands_74.nc"
+file.exists(elev_bands_file_nc)
+#> [1] TRUE
+```
+
+Verificação do arquivo gerado.
+
+``` r
+#if (requireNamespace("tidync", quietly = TRUE)) {
+  library(tidync)
+  out <- tidync(elev_bands_file_nc) %>% hyper_tibble()
+  # compara arquivo de exemplo do FUSE
+  ref <- tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_elev_bands.nc") %>% hyper_tibble()
+  
+#}
+out
+#> # A tibble: 10 x 6
+#>      area_frac mean_elev prec_frac longitude latitude elevation_band
+#>          <dbl>     <dbl>     <dbl>     <dbl>    <dbl>          <dbl>
+#>  1 0.000276          638 0.0000591     -50.3    -26.0              1
+#>  2 0.133             738 0.135         -50.3    -26.0              2
+#>  3 0.394             838 0.389         -50.3    -26.0              3
+#>  4 0.259             938 0.255         -50.3    -26.0              4
+#>  5 0.104            1038 0.109         -50.3    -26.0              5
+#>  6 0.0789           1138 0.0819        -50.3    -26.0              6
+#>  7 0.0284           1238 0.0266        -50.3    -26.0              7
+#>  8 0.00330          1338 0.00296       -50.3    -26.0              8
+#>  9 0.000104         1438 0.0000155     -50.3    -26.0              9
+#> 10 0.000000765      1538 0             -50.3    -26.0             10
+```
+
+``` r
+ref
+#> # A tibble: 14 x 6
+#>    area_frac mean_elev prec_frac longitude latitude elevation_band
+#>        <dbl>     <dbl>     <dbl>     <dbl>    <dbl>          <dbl>
+#>  1   0.00511      2450   0.00511      39.6     39.6              1
+#>  2   0.0132       2550   0.0132       39.6     39.6              2
+#>  3   0.0196       2650   0.0196       39.6     39.6              3
+#>  4   0.0312       2750   0.0312       39.6     39.6              4
+#>  5   0.0556       2850   0.0556       39.6     39.6              5
+#>  6   0.0836       2950   0.0836       39.6     39.6              6
+#>  7   0.126        3050   0.126        39.6     39.6              7
+#>  8   0.158        3150   0.158        39.6     39.6              8
+#>  9   0.180        3250   0.180        39.6     39.6              9
+#> 10   0.149        3350   0.149        39.6     39.6             10
+#> 11   0.0897       3450   0.0897       39.6     39.6             11
+#> 12   0.0618       3550   0.0618       39.6     39.6             12
+#> 13   0.0271       3650   0.0271       39.6     39.6             13
+#> 14   0.00124      3750   0.00124      39.6     39.6             14
+```
+
+## Arquivo NetCDF de forçantes meteorológicas
+
+<https://github.com/naddor/tofu/blob/master/input_output_settings/write_forcing.R>
