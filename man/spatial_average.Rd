@@ -11,8 +11,8 @@ spatial_average(meteo_brick, poly_station, fun = mean)
 \item{meteo_brick}{\code{\link[raster]{brick}} of meteorological field
 (e.g.: precipitation, evapotranspiration, etc).}
 
-\item{poly_station}{object of class \code{\link[sf]{sf}} and geometry
-type polygon of station catchment.}
+\item{poly_station}{\code{\link[sf]{sf}} polygon of station catchment or a
+\code{\link[raster]{extent}}.}
 
 \item{fun}{function to apply. Default: mean.}
 }

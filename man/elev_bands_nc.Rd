@@ -9,18 +9,18 @@
 \usage{
 elev_bands_nc(
   elev_tab,
-  lon,
-  lat,
+  ccoords,
   file_nc = "inst/extdata/elevation_bands_74.nc",
-  na = -9999
+  na = -9999,
+  force_v4 = TRUE,
+  overwrite = FALSE
 )
 }
 \arguments{
 \item{elev_tab}{data.frame output from \code{\link{elev_bands}}}
 
-\item{lon}{scalar numeric}
-
-\item{lat}{sclar numeric}
+\item{ccoords}{a \link[tibble:tibble-package]{tibble} with columns \code{lon}
+and \code{lat}.}
 
 \item{file_nc}{character, path to NetCDF file}
 
@@ -33,15 +33,15 @@ character, path to the NetCDF file.
 Elevation bands NetCDF file
 }
 \examples{
-if(FALSE){
- elevation_tab <- elev_bands(
-   con_dem = condem74, meteo_raster = precclim74, dz = 100
- )
- elev_bands_nc(elev_tab = elevation_tab,
-               lon = -45.5,
-               lat = -23.5,
-               file_nc = file.path(tempdir(), "elevation_bands_74.nc")
-               na = -9999
-               )
+if (FALSE) {
+  elevation_tab <- elev_bands(
+    con_dem = condem74, meteo_raster = precclim74, dz = 100
+  )
+  elev_bands_nc(
+    elev_tab = elevation_tab,
+    ccoords = centroids(poly74)
+    file_nc = file.path(tempdir(), "elevation_bands_74.nc"),
+    na = -9999
+  )
 }
 }

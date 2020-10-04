@@ -21,14 +21,10 @@ You can install the development version of **{`fuse.prep`}** from
 devtools::install_github("lhmet-ped/fuse.prep")
 ```
 
-## Data
+## Data for generating the NetCDF files
 
-This is a basic example which shows you how to create the elevation
-bands NetCDF file.
-
-Os dados de exemplo necessários são disponibilizados com os pacotes
-**`{HEgis}`** (`poly74` e `condem74`) e **`{fuse.prep}`**
-(`precclim74`):
+Os dados de exemplo são da Bacia Hidrográfica associada ao posto 74 (UHE
+G.B. MUNHOZ). Os dados necessários para geração dos arquivos NetCDF são:
 
   - polígono da bacia hidrográfica do posto do ONS (Simple Feature,
     `sf`)
@@ -38,10 +34,10 @@ Os dados de exemplo necessários são disponibilizados com os pacotes
 
   - precipitação climatológica anual (`raster`)
 
-<!-- end list -->
+Estes dados são disponibilizados com os pacotes **`{HEgis}`** (`poly74`
+e `condem74`) e **`{fuse.prep}`** (`precclim74`).
 
 ``` r
-library(fuse.prep)
 library(HEgis)
 poly74
 #> Simple feature collection with 1 feature and 9 fields
@@ -62,6 +58,7 @@ condem74
 #> source     : memory
 #> names      : layer 
 #> values     : 588, 1506  (min, max)
+library(fuse.prep)
 precclim74
 #> class      : RasterLayer 
 #> dimensions : 8, 13, 104  (nrow, ncol, ncell)
@@ -70,18 +67,22 @@ precclim74
 #> crs        : +proj=longlat +datum=WGS84 +no_defs 
 #> source     : memory
 #> names      : layer 
-#> values     : 1449.61, 2070.507  (min, max)
+#> values     : 1444.804, 2400.077  (min, max)
 ```
 
 Para saber como gerar estes 3 arquivos veja a vinheta do pacote.
 
-## Arquivo NetCDF de bandas de elevação
+### Arquivo NetCDF de bandas de elevação
 
-Tabela com frações de área da bacia hidrográfica e da precipitação por
-banda de elevação.
+A tabela com frações de área da bacia hidrográfica e da precipitação
+anual por banda de elevação é obtida com a função `elev_bands()`:
 
 ``` r
-elev_tab_format <- elev_bands(con_dem = condem74, meteo_raster = precclim74, nbands = 14)
+elev_tab_format <- elev_bands(
+  con_dem = condem74, 
+  meteo_raster = precclim74, 
+  nbands = 14
+)
 #>   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================================                  |  75%  |                                                                              |======================================================================| 100%
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
@@ -89,39 +90,30 @@ elev_tab_format
 #> # A tibble: 14 x 6
 #>     zone   inf   sup mean_elev area_frac prec_frac
 #>    <dbl> <dbl> <dbl>     <dbl>     <dbl>     <dbl>
-#>  1     1  588   654.      621. 0.000195  0.0000403
-#>  2     2  654.  719.      686. 0.00367   0.00416  
-#>  3     3  719.  785.      752. 0.113     0.115    
-#>  4     4  785.  850.      818. 0.277     0.275    
+#>  1     1  588   654.      621. 0.000195  0.000240 
+#>  2     2  654.  719.      686. 0.00367   0.00427  
+#>  3     3  719.  785.      752. 0.113     0.112    
+#>  4     4  785.  850.      818. 0.277     0.271    
 #>  5     5  850.  916.      883. 0.236     0.230    
 #>  6     6  916.  981.      949. 0.147     0.146    
 #>  7     7  981. 1047      1014. 0.0717    0.0752   
-#>  8     8 1047  1113.     1080. 0.0632    0.0671   
-#>  9     9 1113. 1178.     1145. 0.0507    0.0523   
-#> 10    10 1178. 1244.     1211. 0.0271    0.0263   
-#> 11    11 1244. 1309.     1276. 0.00842   0.00730  
-#> 12    12 1309. 1375.     1342. 0.00177   0.00163  
-#> 13    13 1375. 1440.     1408. 0.000146  0.0000318
-#> 14    14 1440. 1506      1473. 0.0000150 0
+#>  8     8 1047  1113.     1080. 0.0632    0.0672   
+#>  9     9 1113. 1178.     1145. 0.0507    0.0541   
+#> 10    10 1178. 1244.     1211. 0.0271    0.0287   
+#> 11    11 1244. 1309.     1276. 0.00842   0.00901  
+#> 12    12 1309. 1375.     1342. 0.00177   0.00194  
+#> 13    13 1375. 1440.     1408. 0.000146  0.000178 
+#> 14    14 1440. 1506      1473. 0.0000150 0.0000193
 ```
 
 Centróides da bacia hidrográfica
 
 ``` r
-# lon  e lat do centróide do polígono
-library(sf)
-#> Linking to GEOS 3.8.0, GDAL 3.0.4, PROJ 6.3.1
-ll_74 <- suppressWarnings(st_centroid(poly74))
-plot(st_geometry(poly74))
-plot(ll_74, add = TRUE)
-#> Warning in plot.sf(ll_74, add = TRUE): ignoring all but the first attribute
-```
-
-<img src="man/figures/README-centroides-1.png" width="100%" />
-
-``` r
-lon_74 <- st_coordinates(ll_74)[[1]]
-lat_74 <- st_coordinates(ll_74)[[2]]
+(poly_coords <- centroids(poly_station = poly74)  )
+#> # A tibble: 1 x 2
+#>     lon   lat
+#>   <dbl> <dbl>
+#> 1 -50.3 -26.0
 ```
 
 Escrita do arquivo NetCDF de bandas de elevação.
@@ -129,13 +121,12 @@ Escrita do arquivo NetCDF de bandas de elevação.
 ``` r
 elev_bands_file_nc <- elev_bands_nc(
   elev_tab = elev_tab_format,
-  lon = lon_74,
-  lat = lat_74,
+  ccoords = poly_coords,
   file_nc = file.path(tempdir(), "elevation_bands_74.nc"),
   na = -9999
 )
 elev_bands_file_nc
-#> [1] "/tmp/RtmpZbkOdN/elevation_bands_74.nc"
+#> [1] "/tmp/RtmphEel8T/elevation_bands_74.nc"
 file.exists(elev_bands_file_nc)
 #> [1] TRUE
 ```
@@ -153,20 +144,20 @@ out
 #> # A tibble: 14 x 6
 #>    area_frac mean_elev prec_frac longitude latitude elevation_band
 #>        <dbl>     <dbl>     <dbl>     <dbl>    <dbl>          <dbl>
-#>  1 0.000195       621. 0.0000403     -50.3    -26.0              1
-#>  2 0.00367        686. 0.00416       -50.3    -26.0              2
-#>  3 0.113          752. 0.115         -50.3    -26.0              3
-#>  4 0.277          818. 0.275         -50.3    -26.0              4
+#>  1 0.000195       621. 0.000240      -50.3    -26.0              1
+#>  2 0.00367        686. 0.00427       -50.3    -26.0              2
+#>  3 0.113          752. 0.112         -50.3    -26.0              3
+#>  4 0.277          818. 0.271         -50.3    -26.0              4
 #>  5 0.236          883. 0.230         -50.3    -26.0              5
 #>  6 0.147          949. 0.146         -50.3    -26.0              6
 #>  7 0.0717        1014. 0.0752        -50.3    -26.0              7
-#>  8 0.0632        1080. 0.0671        -50.3    -26.0              8
-#>  9 0.0507        1145. 0.0523        -50.3    -26.0              9
-#> 10 0.0271        1211. 0.0263        -50.3    -26.0             10
-#> 11 0.00842       1276. 0.00730       -50.3    -26.0             11
-#> 12 0.00177       1342. 0.00163       -50.3    -26.0             12
-#> 13 0.000146      1408. 0.0000318     -50.3    -26.0             13
-#> 14 0.0000150     1473. 0             -50.3    -26.0             14
+#>  8 0.0632        1080. 0.0672        -50.3    -26.0              8
+#>  9 0.0507        1145. 0.0541        -50.3    -26.0              9
+#> 10 0.0271        1211. 0.0287        -50.3    -26.0             10
+#> 11 0.00842       1276. 0.00901       -50.3    -26.0             11
+#> 12 0.00177       1342. 0.00194       -50.3    -26.0             12
+#> 13 0.000146      1408. 0.000178      -50.3    -26.0             13
+#> 14 0.0000150     1473. 0.0000193     -50.3    -26.0             14
 ```
 
 ``` r

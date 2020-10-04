@@ -32,11 +32,9 @@ devtools::install_github("lhmet-ped/fuse.prep")
 ```
 
 
-## Data
+## Data for generating the NetCDF files
 
-This is a basic example which shows you how to create the elevation bands NetCDF file.
-
-Os dados de exemplo necessários são disponibilizados com os pacotes **`{HEgis}`** (`poly74` e `condem74`) e **`{fuse.prep}`** (`precclim74`):
+Os dados de exemplo são da Bacia Hidrográfica associada ao posto 74 (UHE G.B. MUNHOZ). Os dados necessários para geração dos arquivos NetCDF são: 
 
 - polígono da bacia hidrográfica do posto do ONS (Simple Feature, `sf`)
 
@@ -44,24 +42,30 @@ Os dados de exemplo necessários são disponibilizados com os pacotes **`{HEgis}
 
 - precipitação climatológica anual (`raster`)
 
+Estes dados são disponibilizados com os pacotes **`{HEgis}`** (`poly74` e `condem74`) e **`{fuse.prep}`** (`precclim74`).
+
 
 ```{r data}
-library(fuse.prep)
 library(HEgis)
 poly74
 condem74
+library(fuse.prep)
 precclim74
 ```
 
 Para saber como gerar estes 3 arquivos veja a vinheta do pacote.
 
-## Arquivo NetCDF de bandas de elevação 
+### Arquivo NetCDF de bandas de elevação 
 
-Tabela com frações de área da bacia hidrográfica e da precipitação por banda de
-elevação.
+A tabela com frações de área da bacia hidrográfica e da precipitação anual por banda de
+elevação é obtida com a função `elev_bands()`:
 
 ```{r}
-elev_tab_format <- elev_bands(con_dem = condem74, meteo_raster = precclim74, nbands = 14)
+elev_tab_format <- elev_bands(
+  con_dem = condem74, 
+  meteo_raster = precclim74, 
+  nbands = 14
+)
 elev_tab_format
 ```
 
@@ -69,13 +73,7 @@ Centróides da bacia hidrográfica
 
 
 ```{r centroides}
-# lon  e lat do centróide do polígono
-library(sf)
-ll_74 <- suppressWarnings(st_centroid(poly74))
-plot(st_geometry(poly74))
-plot(ll_74, add = TRUE)
-lon_74 <- st_coordinates(ll_74)[[1]]
-lat_74 <- st_coordinates(ll_74)[[2]]
+(poly_coords <- centroids(poly_station = poly74)  )
 ```
 
 Escrita do arquivo NetCDF de bandas de elevação. 
@@ -83,8 +81,7 @@ Escrita do arquivo NetCDF de bandas de elevação.
 ```{r elv_nc}
 elev_bands_file_nc <- elev_bands_nc(
   elev_tab = elev_tab_format,
-  lon = lon_74,
-  lat = lat_74,
+  ccoords = poly_coords,
   file_nc = file.path(tempdir(), "elevation_bands_74.nc"),
   na = -9999
 )

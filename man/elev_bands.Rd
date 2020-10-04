@@ -19,8 +19,9 @@ area distributions within 100 m elevation by default.}
 bands).}
 }
 \value{
-tibble with fraction of precipitation and elevation covered by
-elevation bands. The output columns in this tibble are:
+a \link[tibble:tibble-package]{tibble} with fraction of precipitation
+and elevation covered by elevation bands. The output columns in this tibble
+are:
 \describe{
 \item{zone}{indice elevation zone}
 \item{inf}{lower limit of elevation band}
