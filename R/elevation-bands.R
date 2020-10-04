@@ -164,7 +164,8 @@ elev_bands_nc <- function(elev_tab,
                           lon,
                           lat,
                           file_nc = "inst/extdata/elevation_bands_74.nc",
-                          na = -9999) {
+                          na = -9999,
+                          force_v4 = TRUE) {
   # elev_tab = elev_tab_format
   req_vars <- c("zone", "mean_elev", "area_frac", "prec_frac")
   checkmate::assert_subset(req_vars, names(elev_tab))
@@ -217,7 +218,8 @@ elev_bands_nc <- function(elev_tab,
   # write variables to file
   nc_conn <- ncdf4::nc_create(
     filename = file_nc,
-    vars = list(area_frac_nc, mean_elev_nc, prec_frac_nc)
+    vars = list(area_frac_nc, mean_elev_nc, prec_frac_nc),
+    force_v4
   )
   ncdf4::ncvar_put(nc_conn, area_frac_nc, vals = elev_tab_format$area_frac)
   ncdf4::ncvar_put(nc_conn, mean_elev_nc, vals = elev_tab_format$mean_elev)
