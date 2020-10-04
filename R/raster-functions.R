@@ -21,6 +21,26 @@
 #             AUTHORITY["EPSG","9122"]],
 #        AUTHORITY["EPSG","4618"]]
 
+# bhs_shp <- "/home/hidrometeorologista/.R/libs/HEgis/extdata/BaciasHidrograficasONS_JUNTOS/BaciasHidrograifcasUHEsONS.shp"
+# bhs_pols <- import_bhs_ons(bhs_shp, quiet = TRUE)
+# st_crs(bhs_pols) <- 4674
+# bhs_pols
+# bhs_pr <- filter(bhs_pols, nome %in%
+#   c("ITAIPU", "P_PRIMAVERA", "JUPIA", "A_VERMELHA", "BARRA_BONITA", "FURNAS"))
+#
+# d <- raster::disaggregate(as_Spatial(bhs_pr))
+#
+# bhs_sep <- st_as_sf(d)
+#
+# cts <- st_centroid_within_poly(bhs_sep)
+# cts <- cts  %>%
+#   mutate(lon = purrr::map_dbl(geometry, ~st_centroid(.x)[[1]]),
+#          lat = purrr::map_dbl(geometry, ~st_centroid(.x)[[2]]))
+#
+# ggplot(data = bhs_sep) +
+#   geom_sf() +
+#   ggrepel::geom_label_repel(data = cts, aes(x = lon, y = lat, label = codONS))
+
 # -----------------------------------------------------------------------------
 #' Save average precipitation or evapotranspiration over upstream drainage
 #' area of a ONS station
