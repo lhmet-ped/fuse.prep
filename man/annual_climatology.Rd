@@ -22,6 +22,10 @@ type polygon of station catchment.}
 
 \item{ref_crs}{character, coordinate reference system.}
 }
+\value{
+\code{\link[raster]{raster}} with the Mean annual climatology of
+meteorological field.
+}
 \description{
 Mean annual climatology of meteorological field
 }

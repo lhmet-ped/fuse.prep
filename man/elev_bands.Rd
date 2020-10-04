@@ -20,7 +20,16 @@ bands).}
 }
 \value{
 tibble with fraction of precipitation and elevation covered by
-elevation bands
+elevation bands. The output columns in this tibble are:
+\describe{
+\item{zone}{indice elevation zone}
+\item{inf}{lower limit of elevation band}
+\item{sup}{upper limit of elevation band}
+\item{mean_elev}{mid point of elevation band}
+\item{area_frac}{fraction of the catchment covered by the elevation band}
+\item{prec_frac}{fraction of catchment precipitation that falls on the
+elevation band}
+}
 }
 \description{
 Fraction of precipitation and catchment area by elevation bands

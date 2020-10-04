@@ -6,7 +6,8 @@
 \alias{fuse.prep-package}
 \title{fuse.prep: Preparation Of Input Data For Fuse}
 \description{
-Data tidyng of forcing time series and elevation bands for FUSE.
+Data tidyng of forcing time series and elevation
+    bands for FUSE.
 }
 \seealso{
 Useful links:
