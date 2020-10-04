@@ -25,21 +25,25 @@
 # bhs_pols <- import_bhs_ons(bhs_shp, quiet = TRUE)
 # st_crs(bhs_pols) <- 4674
 # bhs_pols
-# bhs_pr <- filter(bhs_pols, nome %in%
+# bhs_pr <- dplyr::filter(bhs_pols, nome %in%
 #   c("ITAIPU", "P_PRIMAVERA", "JUPIA", "A_VERMELHA", "BARRA_BONITA", "FURNAS"))
 #
 # d <- raster::disaggregate(as_Spatial(bhs_pr))
-#
 # bhs_sep <- st_as_sf(d)
 #
-# cts <- st_centroid_within_poly(bhs_sep)
+
+# library(tidyverse); library(sf)
+# cts <- st_centroid_within_poly(bhs_pr)
 # cts <- cts  %>%
-#   mutate(lon = purrr::map_dbl(geometry, ~st_centroid(.x)[[1]]),
-#          lat = purrr::map_dbl(geometry, ~st_centroid(.x)[[2]]))
+#   dplyr::mutate(lon = purrr::map_dbl(geometry, ~sf::st_centroid(.x)[[1]]),
+#          lat = purrr::map_dbl(geometry, ~sf::st_centroid(.x)[[2]]))
 #
+# plot(cts, pch = 4, col =2, add = TRUE)
+
 # ggplot(data = bhs_sep) +
 #   geom_sf() +
 #   ggrepel::geom_label_repel(data = cts, aes(x = lon, y = lat, label = codONS))
+
 
 # -----------------------------------------------------------------------------
 #' Save average precipitation or evapotranspiration over upstream drainage
