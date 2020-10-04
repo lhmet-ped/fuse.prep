@@ -47,8 +47,8 @@
 #'
 #' @param meteo_brick \code{\link[raster]{brick}} of meteorological field
 #' (e.g.: precipitation, evapotranspiration, etc).
-#' @param poly_station object of class \code{\link[sf]{sf}} and geometry
-#' type polygon of station catchment.
+#' @param poly_station \code{\link[sf]{sf}} polygon of station catchment or a
+#' \code{\link[raster]{extent}}.
 #' @param fun function to apply. Default: mean.
 #'
 #' @return a character path to the RDS file with a \code{\link[tibble]{tibble}}
