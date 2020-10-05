@@ -176,8 +176,8 @@ elev_bands_nc <- function(elev_tab,
   checkmate::assert_class(ccoords, "data.frame")
   checkmate::assert_directory_exists(dirname(file_nc))
 
-  elev_tab_format <- dplyr::select(
-    elev_tab_format,
+  elev_tab <- dplyr::select(
+    elev_tab,
     dplyr::all_of(req_vars)
   )
 
@@ -188,7 +188,7 @@ elev_bands_nc <- function(elev_tab,
     vals = list(
       ccoords[["lon"]],
       ccoords[["lat"]],
-      sort(elev_tab_format[["zone"]])
+      sort(elev_tab[["zone"]])
     )
   ) %>%
     purrr::pmap(., ncdf4::ncdim_def)
@@ -229,7 +229,7 @@ elev_bands_nc <- function(elev_tab,
       ncdf4::ncvar_put(
         nc = nc_conn,
         varid = vars_att_sel,
-        vals = elev_tab_format[[ivar]]
+        vals = elev_tab[[ivar]]
       )
     }
   )
