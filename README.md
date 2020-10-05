@@ -26,13 +26,11 @@ devtools::install_github("lhmet-ped/fuse.prep")
 Os dados de exemplo são da Bacia Hidrográfica associada ao posto 74 (UHE
 G.B. MUNHOZ). Os dados necessários para geração dos arquivos NetCDF são:
 
-  - polígono da bacia hidrográfica do posto do ONS (Simple Feature,
-    `sf`)
+  - polígono da bacia hidrográfica (*Simple Feature*, `sf`)
 
-  - os dados de elevação do terreno (`raster`) hidrologicamente
-    condicionados
+  - raster da elevação do terreno hidrologicamente condicionado
 
-  - precipitação climatológica anual (`raster`)
+  - raster da precipitação climatológica anual
 
 Estes dados são disponibilizados com os pacotes **`{HEgis}`** (`poly74`
 e `condem74`) e **`{fuse.prep}`** (`precclim74`).
@@ -74,11 +72,16 @@ Para saber como gerar estes 3 arquivos veja a vinheta do pacote.
 
 ### Arquivo NetCDF de bandas de elevação
 
-A tabela com frações de área da bacia hidrográfica e da precipitação
-anual por banda de elevação é obtida com a função `elev_bands()`:
+O arquivo NetCDF de bandas de elevação é gerado com a função
+`elev_bands_nc()` que utiliza a tabela de bandas de elevação e o
+centróide do polígono.
+
+A tabela de bandas de elevação contém as frações de área da bacia
+hidrográfica e da precipitação anual por banda de elevação é obtida com
+a função `elev_bands()`:
 
 ``` r
-elev_tab_format <- elev_bands(
+elev_bands_tab <- elev_bands(
   con_dem = condem74, 
   meteo_raster = precclim74, 
   nbands = 14
@@ -86,7 +89,7 @@ elev_tab_format <- elev_bands(
 #>   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================================                  |  75%  |                                                                              |======================================================================| 100%
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
-elev_tab_format
+elev_bands_tab
 #> # A tibble: 14 x 6
 #>     zone   inf   sup mean_elev area_frac prec_frac
 #>    <dbl> <dbl> <dbl>     <dbl>     <dbl>     <dbl>
@@ -106,79 +109,30 @@ elev_tab_format
 #> 14    14 1440. 1506      1473. 0.0000150 0.0000193
 ```
 
-Centróides da bacia hidrográfica
+O centróide do polígono da bacia hidrográfica é obtido com a função
+`centroids()`.
 
 ``` r
-(poly_coords <- centroids(poly_station = poly74)  )
+(poly_ctrd <- centroids(poly_station = poly74)  )
 #> # A tibble: 1 x 2
 #>     lon   lat
 #>   <dbl> <dbl>
 #> 1 -50.3 -26.0
 ```
 
-Escrita do arquivo NetCDF de bandas de elevação.
+Com aquelas informações podemos então salvá-las no arquivo NetCDF.
 
 ``` r
-elev_bands_file_nc <- elev_bands_nc(
-  elev_tab = elev_tab_format,
-  ccoords = poly_coords,
+elev_bands_file <- elev_bands_nc(
+  elev_tab = elev_bands_tab,
+  ccoords = poly_ctrd,
   file_nc = file.path(tempdir(), "elevation_bands_74.nc"),
   na = -9999
 )
-elev_bands_file_nc
-#> [1] "/tmp/RtmphEel8T/elevation_bands_74.nc"
-file.exists(elev_bands_file_nc)
+elev_bands_file
+#> [1] "/tmp/RtmpWEMLNb/elevation_bands_74.nc"
+file.exists(elev_bands_file)
 #> [1] TRUE
-```
-
-Verificação do arquivo gerado.
-
-``` r
-if (requireNamespace("tidync", quietly = TRUE)) {
-  library(tidync)
-  out <- tidync(elev_bands_file_nc) %>% hyper_tibble()
-  # compara arquivo de exemplo do FUSE
-  ref <- tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_elev_bands.nc") %>% hyper_tibble()
-}
-out
-#> # A tibble: 14 x 6
-#>    area_frac mean_elev prec_frac longitude latitude elevation_band
-#>        <dbl>     <dbl>     <dbl>     <dbl>    <dbl>          <dbl>
-#>  1 0.000195       621. 0.000240      -50.3    -26.0              1
-#>  2 0.00367        686. 0.00427       -50.3    -26.0              2
-#>  3 0.113          752. 0.112         -50.3    -26.0              3
-#>  4 0.277          818. 0.271         -50.3    -26.0              4
-#>  5 0.236          883. 0.230         -50.3    -26.0              5
-#>  6 0.147          949. 0.146         -50.3    -26.0              6
-#>  7 0.0717        1014. 0.0752        -50.3    -26.0              7
-#>  8 0.0632        1080. 0.0672        -50.3    -26.0              8
-#>  9 0.0507        1145. 0.0541        -50.3    -26.0              9
-#> 10 0.0271        1211. 0.0287        -50.3    -26.0             10
-#> 11 0.00842       1276. 0.00901       -50.3    -26.0             11
-#> 12 0.00177       1342. 0.00194       -50.3    -26.0             12
-#> 13 0.000146      1408. 0.000178      -50.3    -26.0             13
-#> 14 0.0000150     1473. 0.0000193     -50.3    -26.0             14
-```
-
-``` r
-ref
-#> # A tibble: 14 x 6
-#>    area_frac mean_elev prec_frac longitude latitude elevation_band
-#>        <dbl>     <dbl>     <dbl>     <dbl>    <dbl>          <dbl>
-#>  1   0.00511      2450   0.00511      39.6     39.6              1
-#>  2   0.0132       2550   0.0132       39.6     39.6              2
-#>  3   0.0196       2650   0.0196       39.6     39.6              3
-#>  4   0.0312       2750   0.0312       39.6     39.6              4
-#>  5   0.0556       2850   0.0556       39.6     39.6              5
-#>  6   0.0836       2950   0.0836       39.6     39.6              6
-#>  7   0.126        3050   0.126        39.6     39.6              7
-#>  8   0.158        3150   0.158        39.6     39.6              8
-#>  9   0.180        3250   0.180        39.6     39.6              9
-#> 10   0.149        3350   0.149        39.6     39.6             10
-#> 11   0.0897       3450   0.0897       39.6     39.6             11
-#> 12   0.0618       3550   0.0618       39.6     39.6             12
-#> 13   0.0271       3650   0.0271       39.6     39.6             13
-#> 14   0.00124      3750   0.00124      39.6     39.6             14
 ```
 
 ## Arquivo NetCDF de forçantes meteorológicas
