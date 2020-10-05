@@ -135,8 +135,24 @@ elev_bands <- function(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL) {
 
 
 #------------------------------------------------------------------------------
+#' Check input arguments has expected values and return required vars in z_bands
+#' @noRd
+#' @family elevation bands functions
+.check_input <- function(z_bands, ctrd, file){
+  var_names <- c("area_frac", "mean_elev", "prec_frac")
+  req_vars <- c("zone", var_names)
+  checkmate::assert_subset(req_vars, names(z_bands))
+  checkmate::assert_subset(c("lon", "lat"), names(ctrd))
+  checkmate::assert_class(ctrd, "data.frame")
+  checkmate::assert_directory_exists(dirname(file))
+  req_vars
+}
+
+
+
 #' Select attribute list element of a variable
 #' @noRd
+#' @family elevation bands functions
 .select_attr_var <- function(att_list, var_name){
   att_list[[which(unlist(purrr::map(att_list, "name")) == var_name)]]
 }
@@ -165,6 +181,7 @@ elev_bands <- function(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL) {
 #'     na = -9999
 #'   )
 #' }
+#' @family elevation bands functions
 elev_bands_nc <- function(elev_tab,
                           ccoords,
                           file_nc = "inst/extdata/elevation_bands_74.nc",
@@ -173,17 +190,10 @@ elev_bands_nc <- function(elev_tab,
                           overwrite = FALSE) {
 
   # elev_tab = elev_tab_format; ccoords = poly_coords
-  var_names <- c("area_frac", "mean_elev", "prec_frac")
-  req_vars <- c("zone", var_names)
-  checkmate::assert_subset(req_vars, names(elev_tab))
-  checkmate::assert_subset(c("lon", "lat"), names(ccoords))
-  checkmate::assert_class(ccoords, "data.frame")
-  checkmate::assert_directory_exists(dirname(file_nc))
+  req_vars <- .check_input(elev_tab, ccoords, file_nc)
+  var_names <- req_vars[req_vars != "zone"]
 
-  elev_tab <- dplyr::select(
-    elev_tab,
-    dplyr::all_of(req_vars)
-  )
+  elev_tab <- dplyr::select(elev_tab, dplyr::all_of(req_vars))
 
   # define dimensions
   dim_atts_l <- tibble::tibble(
@@ -207,6 +217,7 @@ elev_bands_nc <- function(elev_tab,
   )
   names(long_names) <- var_names
 
+  # define variables attributes
   vars_atts_l <- tibble::tibble(
     name = names(long_names),
     units = c("-", "m asl", "-"),
@@ -246,7 +257,10 @@ elev_bands_nc <- function(elev_tab,
 #-------------------------------------------------------------------------------
 #' Centroids
 #' @noRd
-#' @source
+#' @references
+#' \url{https://stackoverflow.com/questions/52522872/r-sf-package-centroid-within-polygon}
+#' \url{https://stackoverflow.com/users/3609772/mitch}.
+#' @family elevation bands functions
 st_centroid_within_poly <- function(poly) {
   # poly = poly74
   checkmate::assert_choice("codONS", names(poly))
@@ -264,6 +278,7 @@ st_centroid_within_poly <- function(poly) {
 #' @inheritParams spatial_average
 #' @return a \link[tibble:tibble-package]{tibble} with columns `lon` and `lat`.
 #' @export
+#' @family elevation bands functions
 centroids <- function(poly_station){
   cll <- st_centroid_within_poly(poly_station)
   #plot(st_geometry(poly_station))
