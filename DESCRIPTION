@@ -26,7 +26,8 @@ Imports:
     stats,
     stringr,
     tibble,
-    utils
+    utils,
+    purrr
 Suggests: 
     testthat
 Encoding: UTF-8

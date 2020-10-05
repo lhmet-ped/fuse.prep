@@ -45,5 +45,9 @@ Fraction of precipitation and catchment area by elevation bands
 \seealso{
 \code{\link[raster]{cut}}, \code{\link[raster]{resample}},
 \code{\link[raster]{zonal}}
+
+Other elevation bands functions: 
+\code{\link{centroids}()},
+\code{\link{elev_bands_nc}()}
 }
 \concept{elevation bands functions}

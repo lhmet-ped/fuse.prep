@@ -12,12 +12,11 @@ elev_bands_nc(
   ccoords,
   file_nc = "inst/extdata/elevation_bands_74.nc",
   na = -9999,
-  force_v4 = TRUE,
-  overwrite = FALSE
+  force_v4 = TRUE
 )
 }
 \arguments{
-\item{elev_tab}{data.frame output from \code{\link{elev_bands}}}
+\item{elev_tab}{data.frame output from \link{elev_bands}}
 
 \item{ccoords}{a \link[tibble:tibble-package]{tibble} with columns \code{lon}
 and \code{lat}.}
@@ -25,6 +24,12 @@ and \code{lat}.}
 \item{file_nc}{character, path to NetCDF file}
 
 \item{na}{scalar numeric, Default: -9999}
+
+\item{force_v4}{If TRUE, then the created output file will always be in netcdf-4 format (which
+ supports more features, but
+ cannot be read by version 3 of the netcdf library).  If FALSE, then the file is created
+ in netcdf version 3 format UNLESS the user has requested features that require version 4.
+ Deafult is FALSE.}
 }
 \value{
 character, path to the NetCDF file.
@@ -33,15 +38,22 @@ character, path to the NetCDF file.
 Elevation bands NetCDF file
 }
 \examples{
+\dontrun{
 if (FALSE) {
   elevation_tab <- elev_bands(
     con_dem = condem74, meteo_raster = precclim74, dz = 100
   )
   elev_bands_nc(
     elev_tab = elevation_tab,
-    ccoords = centroids(poly74)
+    ccoords = centroids(poly74),
     file_nc = file.path(tempdir(), "elevation_bands_74.nc"),
     na = -9999
   )
+}}
 }
+\seealso{
+Other elevation bands functions: 
+\code{\link{centroids}()},
+\code{\link{elev_bands}()}
 }
+\concept{elevation bands functions}

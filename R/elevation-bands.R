@@ -159,35 +159,36 @@ elev_bands <- function(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL) {
 
 #' Elevation bands NetCDF file
 #'
-#' @param elev_tab data.frame output from \code{\link{elev_bands}}
+#' @param elev_tab data.frame output from \link{elev_bands}
 #' @param ccoords a \link[tibble:tibble-package]{tibble} with columns `lon`
 #' and `lat`.
 #' @param file_nc character, path to NetCDF file
 #' @param na scalar numeric, Default: -9999
-#'
+#' @inheritParams ncdf4::nc_create
 #' @return character, path to the NetCDF file.
 #' @export
 #'
 #' @source \url{https://github.com/naddor/tofu/blob/master/input_output_settings/create_elev_bands_nc.R}
 #' @examples
+#' \dontrun{
 #' if (FALSE) {
 #'   elevation_tab <- elev_bands(
 #'     con_dem = condem74, meteo_raster = precclim74, dz = 100
 #'   )
 #'   elev_bands_nc(
 #'     elev_tab = elevation_tab,
-#'     ccoords = centroids(poly74)
+#'     ccoords = centroids(poly74),
 #'     file_nc = file.path(tempdir(), "elevation_bands_74.nc"),
 #'     na = -9999
 #'   )
-#' }
+#' }}
 #' @family elevation bands functions
 elev_bands_nc <- function(elev_tab,
                           ccoords,
                           file_nc = "inst/extdata/elevation_bands_74.nc",
                           na = -9999,
-                          force_v4 = TRUE,
-                          overwrite = FALSE) {
+                          force_v4 = TRUE
+                          ) {
 
   # elev_tab = elev_tab_format; ccoords = poly_coords
   req_vars <- .check_input(elev_tab, ccoords, file_nc)

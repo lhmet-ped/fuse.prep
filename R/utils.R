@@ -14,7 +14,10 @@ utils::globalVariables(
     "prec_frac",
     "sup",
     "zone",
-    "."
+    ".",
+    "X",
+    "Y",
+    "name"
   )
 )
 

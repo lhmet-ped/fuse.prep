@@ -16,3 +16,9 @@ a \link[tibble:tibble-package]{tibble} with columns \code{lon} and \code{lat}.
 \description{
 Centroid of polygon
 }
+\seealso{
+Other elevation bands functions: 
+\code{\link{elev_bands_nc}()},
+\code{\link{elev_bands}()}
+}
+\concept{elevation bands functions}
