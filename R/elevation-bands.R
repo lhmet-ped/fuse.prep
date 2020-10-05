@@ -135,7 +135,11 @@ elev_bands <- function(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL) {
 
 
 #------------------------------------------------------------------------------
-
+#' Select attribute list element of a variable
+#' @noRd
+.select_attr_var <- function(att_list, var_name){
+  att_list[[which(unlist(purrr::map(att_list, "name")) == var_name)]]
+}
 
 #' Elevation bands NetCDF file
 #'
@@ -182,7 +186,7 @@ elev_bands_nc <- function(elev_tab,
   )
 
   # define dimensions
-  dim_atts <- tibble::tibble(
+  dim_atts_l <- tibble::tibble(
     name = c("longitude", "latitude", "elevation_band"),
     units = c("degreesE", "degreesN", "-"),
     vals = list(
@@ -193,7 +197,7 @@ elev_bands_nc <- function(elev_tab,
   ) %>%
     purrr::pmap(., ncdf4::ncdim_def)
 
-  ## names(dim_atts) <- c("dim_lon", "dim_lat", "dim_elev_bands")
+  ## names(dim_atts_l) <- c("dim_lon", "dim_lat", "dim_elev_bands")
 
   # define variables
   long_names <- c(
@@ -206,7 +210,7 @@ elev_bands_nc <- function(elev_tab,
   vars_atts_l <- tibble::tibble(
     name = names(long_names),
     units = c("-", "m asl", "-"),
-    dim = lapply(1:length(name), function(i) dim_atts),
+    dim = lapply(1:length(name), function(i) dim_atts_l),
     missval = rep(na, length(name)),
     longname = long_names
   ) %>%
@@ -223,14 +227,12 @@ elev_bands_nc <- function(elev_tab,
   lapply(
     var_names,
     function(ivar) {
-      # ivar = "prec_frac"
-      vars_att_sel <- vars_atts_l[[which(unlist(purrr::map(vars_atts_l, "name")) == ivar)]]
-      #all.equal(vars_att_sel, prec_frac_nc)
       ncdf4::ncvar_put(
         nc = nc_conn,
-        varid = vars_att_sel,
+        varid = .select_attr_var(vars_atts_l, ivar),
         vals = elev_tab[[ivar]]
       )
+
     }
   )
 
