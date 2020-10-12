@@ -27,15 +27,18 @@
 meteo_forcing_nc <- function(...,
                              dates,
                              ccoords,
-                             file_nc = "inst/extdata/meteo_forcings_74.nc",
+                             file_nc = "inst/extdata/74_input.nc",
                              na = -9999,
                              force_v4 = TRUE) {
+
+
   data_list <- .collect_vars(...)
+  # data_list = list(pr= forcdata74$pr, pet = forcdata74$pet); dates = forcdata74$date; ccoords = centroids(poly_station = poly74); na = -9999; file_nc = "inst/extdata/74_input.nc"
   var_names <- names(data_list)
 
-  #check inputs
+  #check inputs and def all_vars
   all_vars <- .check_inputs_meteo_forc(
-    variab_list = var_names,
+    variab_list = data_list,
     dts = dates,
     ctrd = ccoords,
     file = file_nc
