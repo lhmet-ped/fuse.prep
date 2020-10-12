@@ -7,33 +7,42 @@
 
 <!-- badges: end -->
 
-The goal of **`{fuse.prep}`** is to prepare the input data for the
-Framework for Understanding Structural Errors
-([FUSE](https://naddor.github.io/fuse/)).
+O pacote **`{fuse.prep}`** tem o objetivo de gerar os dados de entrada
+para aplicação do *Framework for Understanding Structural Errors*
+([FUSE](https://naddor.github.io/fuse/)) na escala de bacia hidrográfica
+(*catchment scale*). São necessários dois arquivos NetCDF de entrada
+para o FUSE:
 
-## Installation
+  - bandas de elevação do terreno: armazena as frações de área da bacia
+    hidrográfica e da precipitação anual por banda de elevação;
 
-You can install the development version of **{`fuse.prep`}** from
-[GitHub](https://github.com/) with:
+  - forçantes meteorológicas: armazena dados diários de temperatura do
+    ar, precipitação, evapotranspiração potencial e opcionalmente de
+    vazão observada;
+
+## Instalação
+
+O **{`fuse.prep`}** pode ser instalado do [GitHub](https://github.com/)
+com:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("lhmet-ped/fuse.prep")
 ```
 
-## Data for generating the NetCDF files
+### Arquivo NetCDF de bandas de elevação
 
 Os dados de exemplo são da Bacia Hidrográfica associada ao posto 74 (UHE
 G.B. MUNHOZ). Os dados necessários para geração dos arquivos NetCDF são:
 
-  - polígono da bacia hidrográfica (*Simple Feature*, `sf`)
+  - raster da precipitação climatológica anual
 
   - raster da elevação do terreno hidrologicamente condicionado
 
-  - raster da precipitação climatológica anual
+  - polígono da bacia hidrográfica (*Simple Feature*, `sf`)
 
-Estes dados são disponibilizados com os pacotes **`{HEgis}`** (`poly74`
-e `condem74`) e **`{fuse.prep}`** (`precclim74`).
+Estes dados são disponibilizados neste pacote (`precclim74`) e com o
+pacote **`{HEgis}`** (`poly74` e `condem74`).
 
 ``` r
 library(HEgis)
@@ -68,17 +77,14 @@ precclim74
 #> values     : 1444.804, 2400.077  (min, max)
 ```
 
-Para saber como gerar estes 3 arquivos veja a vinheta do pacote.
-
-### Arquivo NetCDF de bandas de elevação
+Para saber como estes 3 arquivos foram gerados veja a vinheta do pacote
+(`vignette(asd)`).
 
 O arquivo NetCDF de bandas de elevação é gerado com a função
-`elev_bands_nc()` que utiliza a tabela de bandas de elevação e o
+`elev_bands_nc()` que requer a tabela de bandas de elevação e o
 centróide do polígono.
 
-A tabela de bandas de elevação contém as frações de área da bacia
-hidrográfica e da precipitação anual por banda de elevação é obtida com
-a função `elev_bands()`:
+A tabela de bandas de elevação é obtida com a função `elev_bands()`:
 
 ``` r
 elev_bands_tab <- elev_bands(
@@ -86,7 +92,7 @@ elev_bands_tab <- elev_bands(
   meteo_raster = precclim74, 
   nbands = 14
 )
-#>   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================================                  |  75%  |                                                                              |======================================================================| 100%
+#>   |                                                                              |                                                                      |   0%  |                                                                              |==============                                                        |  20%  |                                                                              |============================                                          |  40%  |                                                                              |==========================================                            |  60%  |                                                                              |========================================================              |  80%  |                                                                              |======================================================================| 100%
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_bands_tab
@@ -120,7 +126,8 @@ O centróide do polígono da bacia hidrográfica é obtido com a função
 #> 1 -50.3 -26.0
 ```
 
-Com aquelas informações podemos então salvá-las no arquivo NetCDF.
+Com aquelas informações podemos então passá-las à `elev_bands_nc()` que
+as salva no arquivo NetCDF.
 
 ``` r
 elev_bands_file <- elev_bands_nc(
@@ -130,7 +137,7 @@ elev_bands_file <- elev_bands_nc(
   na = -9999
 )
 elev_bands_file
-#> [1] "/tmp/RtmpWEMLNb/elevation_bands_74.nc"
+#> [1] "/tmp/RtmpYHZBnz/elevation_bands_74.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```

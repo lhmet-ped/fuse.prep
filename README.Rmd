@@ -18,31 +18,40 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of **`{fuse.prep}`** is to prepare the input data for the Framework for Understanding Structural Errors ([FUSE](https://naddor.github.io/fuse/)).
+O pacote **`{fuse.prep}`** tem o objetivo de gerar os dados de entrada para aplicação do
+*Framework for Understanding Structural Errors* 
+([FUSE](https://naddor.github.io/fuse/)) na escala de bacia hidrográfica 
+(*catchment scale*). São necessários dois arquivos NetCDF 
+de entrada para o FUSE:
+
+- bandas de elevação do terreno: armazena as frações de área da bacia hidrográfica e da precipitação anual por banda de elevação;
+
+- forçantes meteorológicas: armazena dados diários de temperatura do ar, 
+precipitação, evapotranspiração potencial e opcionalmente de vazão observada;
 
 
+## Instalação
 
-## Installation
-
-You can install the development version of **{`fuse.prep`}** from [GitHub](https://github.com/) with:
+O **{`fuse.prep`}** pode ser instalado do [GitHub](https://github.com/) com:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("lhmet-ped/fuse.prep")
 ```
 
+### Arquivo NetCDF de bandas de elevação 
 
-## Data for generating the NetCDF files
-
-Os dados de exemplo são da Bacia Hidrográfica associada ao posto 74 (UHE G.B. MUNHOZ). Os dados necessários para geração dos arquivos NetCDF são: 
-
-- polígono da bacia hidrográfica (*Simple Feature*, `sf`)
-
-- raster da elevação do terreno hidrologicamente condicionado
+Os dados de exemplo são da Bacia Hidrográfica associada ao posto 74 (UHE G.B. MUNHOZ). 
+Os dados necessários para geração dos arquivos NetCDF são: 
 
 - raster da precipitação climatológica anual 
 
-Estes dados são disponibilizados com os pacotes **`{HEgis}`** (`poly74` e `condem74`) e **`{fuse.prep}`** (`precclim74`).
+- raster da elevação do terreno hidrologicamente condicionado
+
+- polígono da bacia hidrográfica (*Simple Feature*, `sf`)
+
+Estes dados são disponibilizados neste pacote (`precclim74`) e com o pacote
+**`{HEgis}`** (`poly74` e `condem74`).
 
 
 ```{r data}
@@ -53,14 +62,12 @@ library(fuse.prep)
 precclim74
 ```
 
-Para saber como gerar estes 3 arquivos veja a vinheta do pacote.
-
-### Arquivo NetCDF de bandas de elevação 
+Para saber como estes 3 arquivos foram gerados veja a vinheta do pacote (`vignette(asd)`).
 
 O arquivo NetCDF de bandas de elevação é gerado com a função `elev_bands_nc()`
-que utiliza a tabela de bandas de elevação e o centróide do polígono.
+que requer a tabela de bandas de elevação e o centróide do polígono.
 
-A tabela de bandas de elevação contém as frações de área da bacia hidrográfica e da precipitação anual por banda de elevação é obtida com a função `elev_bands()`:
+A tabela de bandas de elevação é obtida com a função `elev_bands()`:
 
 ```{r elev_tab}
 elev_bands_tab <- elev_bands(
@@ -78,7 +85,8 @@ O centróide do polígono da bacia hidrográfica é obtido com a função `centr
 (poly_ctrd <- centroids(poly_station = poly74)  )
 ```
 
-Com aquelas informações podemos então salvá-las no arquivo NetCDF.
+Com aquelas informações podemos então passá-las à `elev_bands_nc()` que as 
+salva no arquivo NetCDF.
 
 ```{r elv_nc}
 elev_bands_file <- elev_bands_nc(
@@ -105,11 +113,11 @@ if (requireNamespace("tidync", quietly = TRUE)) {
 out
 ```
 ```{r, include = FALSE}
+ref <- tidync::tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_input.nc") %>% tidync::hyper_tibble()
 ref
+names(ref)
+
 ```
-
-
-
 
 
 ## Arquivo NetCDF de forçantes meteorológicas
