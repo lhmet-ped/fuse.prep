@@ -4,7 +4,14 @@
 \alias{meteo_forcing_nc}
 \title{NetCDF file of Meteorological forcings}
 \usage{
-meteo_forcing_nc()
+meteo_forcing_nc(
+  ...,
+  dates,
+  ccoords,
+  file_nc = "inst/extdata/meteo_forcings_74.nc",
+  na = -9999,
+  force_v4 = TRUE
+)
 }
 \description{
 NetCDF file of Meteorological forcings

@@ -4,12 +4,9 @@
 \alias{annual_summary}
 \title{Summarize a brick by year}
 \usage{
-annual_summary(meteo_brick, fun)
+annual_summary(b, fun)
 }
 \arguments{
-\item{meteo_brick}{\code{\link[raster]{brick}} of meteorological field
-(e.g.: precipitation, evapotranspiration, etc).}
-
 \item{fun}{function to apply. Default: mean.}
 }
 \description{
