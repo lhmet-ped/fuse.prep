@@ -1,14 +1,13 @@
 #' Collect arguments
 #' @noRd
-.collect_vars <- function(...){
-  nms_l <-  as.list(substitute(...()))
+.collect_vars <- function(...) {
+  nms_l <- as.list(substitute(...()))
   l <- list(...)
   names(l) <- nms_l
   l
 }
 
-.check_inputs_meteo_forc <- function(variab_list, ctrd, dts,file){
-
+.check_inputs_meteo_forc <- function(variab_list, ctrd, dts, file) {
   all_vars <- c("temp", "pr", "pet", "q_obs")
   vnames <- names(variab_list)
   checkmate::assert_subset(vnames, all_vars)
@@ -29,14 +28,15 @@ meteo_forcing_nc <- function(...,
                              ccoords,
                              file_nc = "inst/extdata/meteo_forcings_74.nc",
                              na = -9999,
-                             force_v4 = TRUE
-                             ){
-
+                             force_v4 = TRUE) {
   data_list <- .collect_vars(...)
   var_names <- names(data_list)
 
   # check inputs
-  all_vars <- .check_input(vnames = var_names, ctrd = ccoords, file = file_nc)
+  all_vars <- .check_inputs_meteo_forc(
+    variab_list = var_names,
+    ctrd = ccoords, file = file_nc
+  )
 
 
   # define dimensions
@@ -51,7 +51,7 @@ meteo_forcing_nc <- function(...,
   ) %>%
     purrr::pmap(., ncdf4::ncdim_def)
 
-  spatial_mode <- 'Catchment'
+  spatial_mode <- "Catchment"
 
   # define variables
   long_names <- c(
@@ -99,5 +99,3 @@ meteo_forcing_nc <- function(...,
 }
 
 # !TESTAR
-
-
