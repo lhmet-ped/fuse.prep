@@ -12,7 +12,7 @@
   vnames <- names(variab_list)
   checkmate::assert_subset(vnames, all_vars)
   identical_lengths <- any(diff(unlist(lapply(variab_list, length))) != 0)
-  checkmate::assert_true(identical_lengths)
+  # checkmate::assert_true(identical_lengths)
   checkmate::assert_subset(class(dts), c("Date", "POSIXct", "POSIXt"))
   checkmate::assert_subset(c("lon", "lat"), names(ctrd))
   checkmate::assert_class(ctrd, "data.frame")
@@ -23,6 +23,7 @@
 
 
 #' NetCDF file of Meteorological forcings
+#' @export
 meteo_forcing_nc <- function(...,
                              dates,
                              ccoords,
@@ -32,10 +33,12 @@ meteo_forcing_nc <- function(...,
   data_list <- .collect_vars(...)
   var_names <- names(data_list)
 
-  # check inputs
+  #check inputs
   all_vars <- .check_inputs_meteo_forc(
     variab_list = var_names,
-    ctrd = ccoords, file = file_nc
+    dts = dates,
+    ctrd = ccoords,
+    file = file_nc
   )
 
 
@@ -99,3 +102,4 @@ meteo_forcing_nc <- function(...,
 }
 
 # !TESTAR
+#meteo_forcing_nc()
