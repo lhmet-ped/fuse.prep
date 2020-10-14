@@ -42,7 +42,7 @@ devtools::install_github("lhmet-ped/fuse.prep")
 ### Arquivo NetCDF de bandas de elevação 
 
 Os dados de exemplo são da Bacia Hidrográfica associada ao posto 74 (UHE G.B. MUNHOZ). 
-Os dados necessários para geração dos arquivos NetCDF são: 
+Os dados necessários para geração do arquivo NetCDF de bandas de elevação: 
 
 - raster da precipitação climatológica anual 
 
@@ -50,7 +50,7 @@ Os dados necessários para geração dos arquivos NetCDF são:
 
 - polígono da bacia hidrográfica (*Simple Feature*, `sf`)
 
-Estes dados são disponibilizados neste pacote (`precclim74`) e com o pacote
+Estes dados são disponibilizados com este pacote (`precclim74`) e com o pacote
 **`{HEgis}`** (`poly74` e `condem74`).
 
 
@@ -106,7 +106,8 @@ file.exists(elev_bands_file)
 #Verificação do arquivo gerado.
 if (requireNamespace("tidync", quietly = TRUE)) {
   library(tidync)
-  out <- tidync(elev_bands_file) %>% hyper_tibble()
+  out <- tidync(elev_bands_file) %>% 
+    hyper_tibble()
   # compara arquivo de exemplo do FUSE
   ref <- tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_elev_bands.nc") %>% hyper_tibble()
 }
@@ -122,6 +123,40 @@ names(ref)
 
 ## Arquivo NetCDF de forçantes meteorológicas
 
+Para gerar o arquivo NetCDF com as séries temporais das forçantes hidrometeorológicas 
+utilizaremos o conjunto de dados `forcdata74` disponibilizado neste pacote. 
 
-https://github.com/naddor/tofu/blob/master/input_output_settings/write_forcing.R
+```{r}
+forcdata74
+```
+
+Cada variável é passada como um vetor nomeado conforme a seguir. Os nomes dos vetores devem seguir este padrão: `pr` para precipitação, `pet` para evapotranspiração potencial e `q_obs` para vazão observada. Além das séries temporais das variáveis precisamos das datas e o arquivo NetCDF que será salvo.
+
+```{r}
+pr <- forcdata74[["pr"]]
+pet <- forcdata74[["pr"]]
+q_obs <- forcdata74[["q_obs"]]
+# arquivo de saída
+forcings_nc <- "inst/extdata/posto74_input.nc"
+# exporta dados para netcdf
+meteo_forcing_nc(
+  pr, pet, q_obs,
+  dates = forcdata74[["date"]],
+  ccoords = centroids(poly_station = poly74),
+  file_nc = forcings_nc 
+)
+file.exists(forcings_nc)
+```
+
+```{r verif-forcings, include = FALSE}
+library(tidync)
+forcing_file <- "inst/extdata/posto74_input.nc"
+out <- tidync(forcing_file) %>% hyper_tibble()
+# compara arquivo de exemplo do FUSE
+ref <- tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_input.nc") %>% 
+  hyper_tibble()
+out
+ref
+```
+
 
