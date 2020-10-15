@@ -1,3 +1,5 @@
+# fuse.prep 0.0.3
+
 # fuse.prep 0.0.2
 
 - [x] documentar função `meteo_forcing_nc()`
