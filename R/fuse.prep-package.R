@@ -3,13 +3,16 @@
 #' The goal of \pkg{fuse.prep} is to tidy and generate the input data to run FUSE
 #' for a catchement.
 #'
-#'@section \pkg{fuse.prep} functions:
+#'@section \pkg{fuse.prep} Core functions:
 #'
 #' \itemize{
-#'    \code{\link{elev_bands_nc}}: a convenience function to
-#'    create the elevation bands NetCDF file.
+#'    \code{\link{elev_bands_nc}}: creates NetCDF file of elevation bands.
 #' }
 #'
+#' \itemize{
+#'    \code{\link{meteo_forcing_nc}}: creates NetCDF file of Meteorological
+#'     forcings.
+#' }
 #'
 #'@docType package
 #'@name fuse.prep
