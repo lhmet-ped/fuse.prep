@@ -12,7 +12,8 @@ annual_climatology(
 )
 }
 \arguments{
-\item{meteo_brick}{object of class \code{\link[brick]{raster}}}
+\item{meteo_brick}{\code{\link[raster]{brick}} of meteorological field
+(e.g.: precipitation, evapotranspiration, etc).}
 
 \item{poly_station}{\code{\link[sf]{sf}} polygon of station catchment or a
 \code{\link[raster]{extent}}.}
