@@ -4,8 +4,8 @@
 .check_inputs_meteo_forc <- function(variab_list, ctrd, dts, file) {
   vnames <- names(variab_list)
   checkmate::assert_subset(vnames, all_variables())
-  identical_lengths <- any(diff(unlist(lapply(variab_list, length))) != 0)
-  # checkmate::assert_true(identical_lengths)
+  identical_lengths <- all(diff(unname(unlist(lapply(variab_list, length)))) == 0)
+  checkmate::assert_true(identical_lengths)
   checkmate::assert_subset(class(dts), c("Date", "POSIXct", "POSIXt"))
   checkmate::assert_subset(c("lon", "lat", "id"), names(ctrd))
   checkmate::assert_class(ctrd, "data.frame")
@@ -101,8 +101,8 @@ glob_atts_tbl <- function(nc_obj, id) {
 #'    ccoords = centroids(poly_station = poly74),
 #'    file_nc = forcings_nc
 #'  )
-#'file.exists(forcings_nc)
-#'
+#'  file.exists(forcings_nc)
+#'}
 #' @family forcings functions
 meteo_forcing_nc <- function(...,
                              dates,
