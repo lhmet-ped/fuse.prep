@@ -120,11 +120,11 @@ O centróide do polígono da bacia hidrográfica é obtido com a função
 `centroids()`.
 
 ``` r
-(poly_ctrd <- centroids(poly_station = poly74)  )
-#> # A tibble: 1 x 2
-#>     lon   lat
-#>   <dbl> <dbl>
-#> 1 -50.3 -26.0
+(poly_ctrd <- centroids(poly_station = poly74))
+#> # A tibble: 1 x 3
+#>     lon   lat id   
+#>   <dbl> <dbl> <chr>
+#> 1 -50.3 -26.0 74
 ```
 
 Com aquelas informações podemos então passá-las à `elev_bands_nc()` que
@@ -138,7 +138,7 @@ elev_bands_file <- elev_bands_nc(
   na = -9999
 )
 elev_bands_file
-#> [1] "/tmp/RtmphPDfWE/elevation_bands_74.nc"
+#> [1] "/tmp/RtmpYwZg4I/elevation_bands_74.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```
@@ -167,21 +167,20 @@ forcdata74
 #> # … with 13,139 more rows
 ```
 
-Cada variável é passada como um vetor nomeado conforme a seguir. Os
-nomes dos vetores devem seguir este padrão: `pr` para precipitação,
-`pet` para evapotranspiração potencial e `q_obs` para vazão observada.
-Além das séries temporais das variáveis precisamos das datas e o arquivo
-NetCDF que será salvo.
+Cada variável é passada como um vetor conforme a seguir. Os nomes dos
+vetores devem seguir este padrão: `pr` para precipitação, `pet` para
+evapotranspiração potencial e `q_obs` para vazão observada. Além das
+séries temporais das variáveis precisamos das datas, as coordenadas da
+bacia hidrográfica do posto e o arquivo NetCDF que será salvo.
 
 ``` r
-pr <- forcdata74[["pr"]]
-pet <- forcdata74[["pr"]]
-q_obs <- forcdata74[["q_obs"]]
 # arquivo de saída
 forcings_nc <- "inst/extdata/posto74_input.nc"
 # exporta dados para netcdf
 meteo_forcing_nc(
-  pr, pet, q_obs,
+  pr = forcdata74[["pr"]],
+  pet = forcdata74[["pet"]],
+  q_obs = forcdata74[["q_obs"]],
   dates = forcdata74[["date"]],
   ccoords = centroids(poly_station = poly74),
   file_nc = forcings_nc 
