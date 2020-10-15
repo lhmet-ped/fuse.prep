@@ -281,13 +281,14 @@ st_centroid_within_poly <- function(poly) {
 #' @export
 #' @family elevation bands functions
 centroids <- function(poly_station){
+  # poly_station = poly74
   cll <- st_centroid_within_poly(poly_station)
   #plot(st_geometry(poly_station))
   #plot(cll, add = TRUE)
   cll <- cll %>%
     sf::st_coordinates() %>%
     tibble::as_tibble() %>%
-    dplyr::rename(cll, "lon" = X, "lat" = Y) %>%
+    dplyr::rename("lon" = X, "lat" = Y) %>%
     dplyr::mutate(id = poly_station[["codONS"]])
   cll
 }
