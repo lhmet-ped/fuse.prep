@@ -1,12 +1,5 @@
-#' Collect arguments
+#' Check inputs
 #' @noRd
-.collect_vars <- function(...) {
-  nms_l <- as.list(substitute(...()))
-  l <- list(...)
-  names(l) <- nms_l
-  l
-}
-
 .check_inputs_meteo_forc <- function(variab_list, ctrd, dts, file) {
   all_vars <- c("temp", "pr", "pet", "q_obs")
   vnames <- names(variab_list)
@@ -22,7 +15,7 @@
 
 
 
-#' NetCDF file of Meteorological forcings
+#' Create NetCDF file of Meteorological forcings
 #' @export
 meteo_forcing_nc <- function(...,
                              dates,
@@ -32,7 +25,7 @@ meteo_forcing_nc <- function(...,
                              force_v4 = TRUE) {
 
 
-  data_list <- .collect_vars(...)
+  data_list <- list(...)
   # data_list = list(pr= forcdata74$pr, pet = forcdata74$pet); dates = forcdata74$date; ccoords = centroids(poly_station = poly74); na = -9999; file_nc = "inst/extdata/74_input.nc"
   var_names <- names(data_list)
 
