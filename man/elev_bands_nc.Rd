@@ -8,15 +8,27 @@
 }
 \usage{
 elev_bands_nc(
-  elev_tab,
+  con_dem,
+  meteo_raster,
+  dz = 100,
+  nbands = NULL,
   ccoords,
-  file_nc = "inst/extdata/elevation_bands_74.nc",
+  file_nc = "inst/extdata/posto74_elevation_bands.nc",
   na = -9999,
   force_v4 = TRUE
 )
 }
 \arguments{
-\item{elev_tab}{data.frame output from \link{elev_bands}}
+\item{con_dem}{raster of conditioned elevation of catchment}
+
+\item{meteo_raster}{raster of meteorological field (precipitation,
+evapotranspiration, ...).}
+
+\item{dz}{numeric scalar, interval (m) to elevation bands. Calculates basin
+area distributions within 100 m elevation by default.}
+
+\item{nbands}{numeric scalar. Default: NULL (use \code{dz} to build elevation
+bands).}
 
 \item{ccoords}{a \link[tibble:tibble-package]{tibble} with columns \code{lon}
 and \code{lat}.}
@@ -40,11 +52,10 @@ Elevation bands NetCDF file
 \examples{
 \dontrun{
 if (FALSE) {
-  elevation_tab <- elev_bands(
-    con_dem = condem74, meteo_raster = precclim74, dz = 100
-  )
   elev_bands_nc(
-    elev_tab = elevation_tab,
+    con_dem = condem74,
+    meteo_raster = precclim74,
+    dz = 100,
     ccoords = centroids(poly74),
     file_nc = file.path(tempdir(), "elevation_bands_74.nc"),
     na = -9999
