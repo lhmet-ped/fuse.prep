@@ -19,24 +19,10 @@ knitr::opts_chunk$set(
 
 ## Introdução 
 
-O pacote **`{fuse.prep}`** prepara os dados de elevação do terreno e de forçantes hidrometeorológicas necessários para criação dos arquivos NetCDF de entrada do FUSE para uma bacia hidrográfica. 
+O pacote **`{fuse.prep}`** prepara os dados de elevação do terreno e de forçantes hidrometeorológicas necessários para criação dos arquivos NetCDF de entrada do FUSE para uma bacia hidrográfica (BH). 
 
 Nesta vinheta descreve-se o pré-processamento dos dados necessários para geração 
-do arquivo NetCDF de bandas de elevação do terreno. Esta operação é feita pela
- função `elev_bands_nc()` que requer de entrada 
-
-- definição do posto ou estação base da Usina Hidroelétrica (UHE)
-
-- obtenção dos dados de vazão observada
-
-- seleção do polígono do posto
-
-- 
-
-Polígono da BH: `poly74`
-DEM hidrologicamente consistente da BH: `condem74`
-precipitação climatológica anual da BH: `precclim74`
-
+do arquivo NetCDF de bandas de elevação do terreno. 
 
 ## Pré-requisitos
 
@@ -49,3 +35,28 @@ library(fuse.prep)
 ```
 
 ### Dados
+
+A função `elev_bands_nc()` cria o arquivo NetCDF de bandas de elevação e requer os seguintes dados como entrada:
+ 
+- raster do modelo de elevação do terreno recortado e com máscara para BH. Um exemplo de dados é o `condem74` no pacote **`{HEgis}`**
+
+```{r}
+condem74
+```
+
+- raster da climatologia anual de uma variável meteorológica (e.g. precipitação, temperatura, evapotranspiração potencial). Um exemplo de dados é o `precclim74` no pacote **`{HEgis}`**
+
+```{r}
+precclim74
+```
+
+- coordenadas do centróide do polígono da BH. Estas coordenadas resutam da função `centroids()` que requer o polígono da BH. Um exemplo de dado deste tipo é o `poly74` no pacote `HEgis`.
+
+```{r}
+poly74
+```
+
+
+
+
+
