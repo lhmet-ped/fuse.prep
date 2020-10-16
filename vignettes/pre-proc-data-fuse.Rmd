@@ -1,0 +1,51 @@
+---
+title: "Pré-processamento dos dados de entrada para o FUSE"
+author: "Jônatan Tatsch"
+date: '`r Sys.Date()`'
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{pre-proc-data-fuse}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introdução 
+
+O pacote **`{fuse.prep}`** prepara os dados de elevação do terreno e de forçantes hidrometeorológicas necessários para criação dos arquivos NetCDF de entrada do FUSE para uma bacia hidrográfica. 
+
+Nesta vinheta descreve-se o pré-processamento dos dados necessários para geração 
+do arquivo NetCDF de bandas de elevação do terreno. Esta operação é feita pela
+ função `elev_bands_nc()` que requer de entrada 
+
+- definição do posto ou estação base da Usina Hidroelétrica (UHE)
+
+- obtenção dos dados de vazão observada
+
+- seleção do polígono do posto
+
+- 
+
+Polígono da BH: `poly74`
+DEM hidrologicamente consistente da BH: `condem74`
+precipitação climatológica anual da BH: `precclim74`
+
+
+## Pré-requisitos
+
+### Pacotes 
+
+```{r setup}
+library(HEgis)
+#library(HEobs)
+library(fuse.prep)
+```
+
+### Dados
