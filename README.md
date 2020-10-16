@@ -82,42 +82,9 @@ Para saber como estes 3 arquivos foram gerados veja a vinheta do pacote
 (`vignette(asd)`).
 
 O arquivo NetCDF de bandas de elevação é gerado com a função
-`elev_bands_nc()` que requer a tabela de bandas de elevação e o
-centróide do polígono.
-
-A tabela de bandas de elevação é obtida com a função `elev_bands()`:
-
-``` r
-elev_bands_tab <- elev_bands(
-  con_dem = condem74, 
-  meteo_raster = precclim74, 
-  nbands = 14
-)
-#>   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================================                  |  75%  |                                                                              |======================================================================| 100%
-#> 
-#>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
-elev_bands_tab
-#> # A tibble: 14 x 6
-#>     zone   inf   sup mean_elev area_frac prec_frac
-#>    <dbl> <dbl> <dbl>     <dbl>     <dbl>     <dbl>
-#>  1     1  588   654.      621. 0.000195  0.000240 
-#>  2     2  654.  719.      686. 0.00367   0.00427  
-#>  3     3  719.  785.      752. 0.113     0.112    
-#>  4     4  785.  850.      818. 0.277     0.271    
-#>  5     5  850.  916.      883. 0.236     0.230    
-#>  6     6  916.  981.      949. 0.147     0.146    
-#>  7     7  981. 1047      1014. 0.0717    0.0752   
-#>  8     8 1047  1113.     1080. 0.0632    0.0672   
-#>  9     9 1113. 1178.     1145. 0.0507    0.0541   
-#> 10    10 1178. 1244.     1211. 0.0271    0.0287   
-#> 11    11 1244. 1309.     1276. 0.00842   0.00901  
-#> 12    12 1309. 1375.     1342. 0.00177   0.00194  
-#> 13    13 1375. 1440.     1408. 0.000146  0.000178 
-#> 14    14 1440. 1506      1473. 0.0000150 0.0000193
-```
-
-O centróide do polígono da bacia hidrográfica é obtido com a função
-`centroids()`.
+`elev_bands_nc()` que requer como entrada os dados carregados acima e o
+centróide do polígono. O centróide do polígono da bacia hidrográfica é
+obtido com a função `centroids()`.
 
 ``` r
 (poly_ctrd <- centroids(poly_station = poly74))
@@ -127,18 +94,20 @@ O centróide do polígono da bacia hidrográfica é obtido com a função
 #> 1 -50.3 -26.0 74
 ```
 
-Com aquelas informações podemos então passá-las à `elev_bands_nc()` que
-as salva no arquivo NetCDF.
-
 ``` r
 elev_bands_file <- elev_bands_nc(
-  elev_tab = elev_bands_tab,
+  con_dem = condem74, 
+  meteo_raster = precclim74, 
+  nbands = 14,
   ccoords = poly_ctrd,
-  file_nc = file.path(tempdir(), "elevation_bands_74.nc"),
+  file_nc = file.path(tempdir(), "posto74_elevation_bands.nc"),
   na = -9999
 )
+#>   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================================                  |  75%  |                                                                              |======================================================================| 100%
+#> 
+#>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_bands_file
-#> [1] "/tmp/RtmpYwZg4I/elevation_bands_74.nc"
+#> [1] "/tmp/RtmpRvsEd0/posto74_elevation_bands.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```
