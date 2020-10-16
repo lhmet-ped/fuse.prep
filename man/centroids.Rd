@@ -4,11 +4,14 @@
 \alias{centroids}
 \title{Centroid of polygon}
 \usage{
-centroids(poly_station)
+centroids(poly_station, ref_crs = "+proj=longlat +datum=WGS84")
 }
 \arguments{
 \item{poly_station}{\code{\link[sf]{sf}} polygon of station catchment or a
 \code{\link[raster]{extent}}.}
+
+\item{ref_crs}{character, the base coordinate reference system. Default:
+'+proj=longlat +datum=WGS84'.}
 }
 \value{
 a \link[tibble:tibble-package]{tibble} with columns \code{lon} and \code{lat}.
@@ -17,6 +20,8 @@ a \link[tibble:tibble-package]{tibble} with columns \code{lon} and \code{lat}.
 Centroid of polygon
 }
 \seealso{
+\code{\link[HEgis]{prep_poly_posto}}, \code{\link{prep_poly_posto}}
+
 Other elevation bands functions: 
 \code{\link{elev_bands_nc}()},
 \code{\link{elev_bands}()}

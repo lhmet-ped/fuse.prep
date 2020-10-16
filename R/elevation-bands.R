@@ -279,10 +279,17 @@ st_centroid_within_poly <- function(poly) {
 
 #' Centroid of polygon
 #' @inheritParams spatial_average
+#' @inheritParams HEgis::prep_poly_posto
 #' @return a \link[tibble:tibble-package]{tibble} with columns `lon` and `lat`.
 #' @export
 #' @family elevation bands functions
-centroids <- function(poly_station){
+#' @seealso \code{\link[HEgis]{prep_poly_posto}}, \code{\link{prep_poly_posto}}
+centroids <- function(poly_station, ref_crs = "+proj=longlat +datum=WGS84"){
+
+  if(!is.null(ref_crs)){
+    poly_station <- HEgis::prep_poly_posto(poly_station, 0, ref_crs)
+  }
+
   # poly_station = poly74
   cll <- st_centroid_within_poly(poly_station)
   #plot(st_geometry(poly_station))
