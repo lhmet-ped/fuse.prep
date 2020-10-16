@@ -159,7 +159,7 @@ elev_bands <- function(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL) {
 
 #' Elevation bands NetCDF file
 #'
-#' @param elev_tab data.frame output from \link{elev_bands}
+#' @inheritParams elev_bands
 #' @param ccoords a \link[tibble:tibble-package]{tibble} with columns `lon`
 #' and `lat`.
 #' @param file_nc character, path to NetCDF file
@@ -172,25 +172,27 @@ elev_bands <- function(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL) {
 #' @examples
 #' \dontrun{
 #' if (FALSE) {
-#'   elevation_tab <- elev_bands(
-#'     con_dem = condem74, meteo_raster = precclim74, dz = 100
-#'   )
 #'   elev_bands_nc(
-#'     elev_tab = elevation_tab,
+#'     con_dem = condem74,
+#'     meteo_raster = precclim74,
+#'     dz = 100,
 #'     ccoords = centroids(poly74),
 #'     file_nc = file.path(tempdir(), "elevation_bands_74.nc"),
 #'     na = -9999
 #'   )
 #' }}
 #' @family elevation bands functions
-elev_bands_nc <- function(elev_tab,
+elev_bands_nc <- function(con_dem,
+                          meteo_raster,
+                          dz = 100,
+                          nbands = NULL,
                           ccoords,
-                          file_nc = "inst/extdata/elevation_bands_74.nc",
+                          file_nc = "inst/extdata/posto74_elevation_bands.nc",
                           na = -9999,
                           force_v4 = TRUE
                           ) {
 
-  # elev_tab = elev_tab_format; ccoords = poly_coords
+  elev_tab <- elev_bands(con_dem, meteo_raster, dz, nbands)
   req_vars <- .check_input(elev_tab, ccoords, file_nc)
   var_names <- req_vars[req_vars != "zone"]
 
@@ -256,7 +258,7 @@ elev_bands_nc <- function(elev_tab,
 
 
 #-------------------------------------------------------------------------------
-#' Centroids
+#' Centroids within polygons
 #' @noRd
 #' @references
 #' \url{https://stackoverflow.com/questions/52522872/r-sf-package-centroid-within-polygon}
