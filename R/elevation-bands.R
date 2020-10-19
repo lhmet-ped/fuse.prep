@@ -29,7 +29,13 @@
 #' @family elevation bands functions
 #'
 z_bands <- function(z, dz = 100, nbands = NULL){
-  checkmate::assert_number(dz)
+
+  checkmate::assert(
+    checkmate::check_null(dz),
+    checkmate::check_null(nbands)
+  )
+
+  if(is.null(nbands)) checkmate::assert_number(dz)
   if(checkmate::test_class(z, "RasterLayer")){
     z <- raster::values(z)
   }
@@ -71,6 +77,7 @@ z_bands <- function(z, dz = 100, nbands = NULL){
 #'  area distributions within 100 m elevation by default.
 #' @param nbands numeric scalar. Default: NULL (use `dz` to build elevation
 #' bands).
+#' @param quiet Hide messages (FALSE, the default), or display them.
 #' @export
 #' @return a \link[tibble:tibble-package]{tibble} with fraction of precipitation
 #' and elevation covered by elevation bands. The output columns in this tibble
@@ -93,7 +100,9 @@ z_bands <- function(z, dz = 100, nbands = NULL){
 #' @family elevation bands functions
 #' @seealso \code{\link[raster]{cut}}, \code{\link[raster]{resample}},
 #' \code{\link[raster]{zonal}}
-elev_bands <- function(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL) {
+elev_bands <- function(
+  con_dem, meteo_raster = NULL, dz = 100, nbands = NULL, quiet = FALSE
+  ) {
   # con_dem = condem74; meteo_raster = precclim74; dz = 100; nbands = NULL
   bands <- z_bands(z = con_dem, dz, nbands)
 
@@ -106,7 +115,8 @@ elev_bands <- function(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL) {
     sort()
   rbands <- raster::cut(con_dem, breaks = brks, include.lowest = TRUE)
   # plot(rbands)
-  raster::rasterOptions(progress = "text")
+  if(!quiet) raster::rasterOptions(progress = "text")
+
   prec_res <- raster::resample(meteo_raster, rbands)
   rm(meteo_raster, con_dem)
 
@@ -189,10 +199,11 @@ elev_bands_nc <- function(con_dem,
                           ccoords,
                           file_nc = "inst/extdata/posto74_elevation_bands.nc",
                           na = -9999,
-                          force_v4 = TRUE
+                          force_v4 = TRUE,
+                          quiet = FALSE
                           ) {
 
-  elev_tab <- elev_bands(con_dem, meteo_raster, dz, nbands)
+  elev_tab <- elev_bands(con_dem, meteo_raster, dz, nbands, quiet)
   req_vars <- .check_input(elev_tab, ccoords, file_nc)
   var_names <- req_vars[req_vars != "zone"]
 
