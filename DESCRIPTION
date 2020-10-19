@@ -27,7 +27,8 @@ Imports:
     stringr,
     tibble,
     utils,
-    purrr
+    purrr,
+    lhmetools
 Suggests: 
     testthat,
     knitr,

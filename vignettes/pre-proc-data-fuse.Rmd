@@ -1,12 +1,12 @@
 ---
-title: "Pré-processamento dos dados para o arquivo de bandas de elevação do FUSE"
+title: "Pré-processamento dos dados de bandas de elevação"
 author: "Jônatan Tatsch"
 date: '`r Sys.Date()`'
 output:
     bookdown::html_document2:
       base_format: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{pre-proc-data-fuse}
+  %\VignetteIndexEntry{Pré-processamento dos dados de bandas de elevação}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -93,6 +93,7 @@ knitr::include_graphics("mermaid-diagram-20201019171247.svg")
 
 ```{r pcks, message=FALSE, warning=FALSE}
 library(HEgis)
+library(lhmetools)
 library(fuse.prep)
 library(raster)
 library(dplyr)
