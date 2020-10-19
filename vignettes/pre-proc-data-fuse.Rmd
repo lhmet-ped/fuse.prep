@@ -1,5 +1,5 @@
 ---
-title: "Pré-processamento dos dados de entrada para o FUSE"
+title: "Pré-processamento dos dados para o arquivo de bandas de elevação do FUSE"
 author: "Jônatan Tatsch"
 date: '`r Sys.Date()`'
 output:
@@ -27,7 +27,7 @@ Nesta vinheta descreve-se o pré-processamento dos dados necessários para gera�
 do arquivo NetCDF de bandas de elevação do terreno. Este processo é ilustrado 
 na Figura \@ref(fig:fluxograma).
 
-```{r, echo = FALSE, eval = FALSE}
+```{r mermaid, echo = FALSE, eval = FALSE}
 ## Colar texto abaixo em
 # https://mermaid-js.github.io/mermaid-live-editor
 ## e Download svg
@@ -38,30 +38,50 @@ na Figura \@ref(fig:fluxograma).
 #library(DiagrammeR)
 #univar_flowchart = "
 graph TD
-    A1[(CON Hydrosheds)] -->|sa_con_3s_hydrosheds.gr*| A2[extract_condem]
+
+ B1[(Dados Meteorológicos BR)] -->|brick-prec-25km-19800101-20151231.nc| B2[import_nc] 
+ A1[(CON Hydrosheds)] -->|sa_con_3s_hydrosheds.gr*| A2
+
+  subgraph fuse.prep
+
+    B2 --> PB
     A2 --> |con_dem| Z[elev_bands_nc]
-    subgraph HEgis
-    C1[/Parte do nome do posto/] -->|name_regex| C2[info_station]
-    C2 --> |station| C3[extract_poly]
-    end
-    C3 -->|poly_station| A2
-    C3 -->|poly_station| F[annual_climatology]
-    C3 -->|poly_station| C4[centroids]
+    
+     subgraph HEgis
+      C1[/Parte do nome do posto/] -->|name_regex| C2[info_station]
+      C2 --> IP[/info_posto/]
+      IP --> |posto| C3[extract_poly]
+      %%C2 --> |station| C3[extract_poly]
+      PS[/poly_posto/]     
+      A2[extract_condem] 
+     end
+
+    %% poly_station unico
+    C3 --> PS
+    PS --> |poly_station|A2
+    PS --> |poly_station|F[annual_climatology]
+    PS --> |poly_station|C4[centroids]
+
     C4 --> |ccords| Z
     
-    B1[(Dados climaticos Brasil)] --> |brick-prec-25km-19800101-20151231.nc| B2[import_nc]
-    B2 --> |meteo_brick| F
+    PB[/prec_brick/]
+    
+    PB --> |meteo_brick| F
     F --> |meteo_raster| Z
+   
+  end
 
 style C4 stroke:#333,stroke-width:4px
 style F stroke:#333,stroke-width:4px
 style A2 stroke:#333,stroke-width:4px
+style fuse.prep fill:#FFFFFF,stroke:#333,stroke-width:2px
+		
 #"
 #mermaid(diagram = univar_flowchart, width = 800, height = 800)
 ```
 
 ```{r fluxograma, echo = FALSE, fig.align='center', fig.cap="Fluxo de pré-processamento dos dados necessários para criação do NetCDF de bandas de elevação. A região em amarelo indica os processos feitos com o pacote **`{HEgis}`**. Os demais são feitos com o **`{fuse.prep}`**."}
-knitr::include_graphics("mermaid-diagram-20201018162221.svg")
+knitr::include_graphics("mermaid-diagram-20201019171247.svg")
 ```
 
 
@@ -78,7 +98,7 @@ library(raster)
 library(dplyr)
 ```
 
-# Base de dados
+## Base de dados
 
 Para demonstrar o pré-processamento dos dados são usadas duas (grandes) base de dados:
 
@@ -89,7 +109,7 @@ Para demonstrar o pré-processamento dos dados são usadas duas (grandes) base d
 A primeira base de dados é distribuída em [arquivos](https://www.dropbox.com/sh/hmpwobbz9qixxpe/AACTtHDeeLRNOK8_DfZbLHUWa/HydroSHEDS_CON/CON_3s_BIL/sa_con_3s_zip_bil?dl=0&subfolder_nav_tracking=1) divididos em *tiles* que cobrem quase todo o globo. Estes arquivos foram combinados em único arquivo (15 GB) para Amérca do Sul no formato nativo do pacote raster (`sa_con_3s_hydrosheds.grd`) e pode ser baixado  [aqui](https://www.dropbox.com/sh/1agi2378wckr6c3/AAAu2_IBc_9LWTdzvA52VL-Ja?dl=0) [^1]. Este arquivo pode ser baixado manualmente no diretório onde está sendo realizada a preparação de dados para o FUSE. Recomenda-se armazenar os dados em um sub-diretório nomeado `input`.
 
 
-A segunda base de dados é distribuída em [arquivos NetCDF](https://utexas.app.box.com/v/Xavier-etal-IJOC-DATA/) divididos por décadas. Os arquivos dos dados diários de precipitação e evapotranspiração de referência foram combinados em único arquivo NetCDF (1.5 GB para cada variável) e podem ser baixados  [aqui](https://www.dropbox.com/s/hj6bu183myfor9y/brick-prec-25km-19800101-20151231.nc?dl=1) [^1] e [aqui](https://www.dropbox.com/s/jfsehx65g0z8yjo/brick-ETo-25km-19800101-20171231.nc?dl=1), respectivamente. O trecho de código abaixo utiliza a função `import_c` que faz o download dos arquivos NetCDF de cada variável e retorna o caminho de acesso aos arquivos baixados.
+A segunda base de dados é distribuída em [arquivos NetCDF](https://utexas.app.box.com/v/Xavier-etal-IJOC-DATA/) divididos por décadas. Os arquivos dos dados diários de precipitação e evapotranspiração de referência foram combinados em único arquivo NetCDF (1.5 GB para cada variável) e podem ser baixados  [aqui](https://www.dropbox.com/s/hj6bu183myfor9y/brick-prec-25km-19800101-20151231.nc?dl=1) e [aqui](https://www.dropbox.com/s/jfsehx65g0z8yjo/brick-ETo-25km-19800101-20171231.nc?dl=1), respectivamente. O trecho de código abaixo utiliza a função `import_c` que faz o download dos arquivos NetCDF de cada variável e retorna o caminho de acesso aos arquivos baixados.
 
 [^1]: Certifique-se da disponibilidade de espaço para armazenamento dos dados em disco.
 
@@ -98,10 +118,10 @@ A segunda base de dados é distribuída em [arquivos NetCDF](https://utexas.app.
 ```
 
 
-## Exemplo de dados
+## Exemplo de dados pré-processados
 
-O pré-processamento de dados requeridos pela função que cria o arquivo NetCDF de bandas de elevação (`elev_bands_nc()`) consiste nos processos representados pelos retângulos com linha mais grossa na Figura \@ref(fig:fluxograma). Este exemplo de pré-processamento são do posto da **UHE Governador Bento Munhoz da Rocha Neto**, identificada pelo código 74, e incluem:
- 
+O pré-processamento dos dados requeridos pela função que cria o arquivo NetCDF de bandas de elevação (`elev_bands_nc()`) consiste nos processos representados pelos retângulos com linha mais grossa na Figura \@ref(fig:fluxograma). Os dados de saída daquelas funções são o resultado do pré-processamento. Neste exemplo, os dados referem-se ao posto 74 do ONS, e incluem:
+
 - `con_dem`: raster do modelo de elevação do terreno recortado e com máscara para BH. Um exemplo de dados é o `condem74` no pacote **`{HEgis}`** e resulta da função `extract_condem()`.
 
 ```{r con_dem}
@@ -123,7 +143,7 @@ precclim74
 
 # Pré-processamento
 
-Agora nós vamos mostrar como obter os dados listados na seção anterior.
+Agora veremos como obter cada um dos dados listados na seção anterior.
 
 
 ## Centróide da BH (`ccoords`)
@@ -171,13 +191,13 @@ O raster de entrada da função `elev_bands_nc(..., meteo_raster)` é o obtido n
 
 ```{r meteo_raster-flux}
 # lê arquivo de prec diária ou faz download se ele não estiver no dest_dir
-b_dly_prec <- import_nc(
+prec_brick <- import_nc(
   varnc = "prec",
   dest_dir = "input"
 )
 # climatologia anual na BH
 meteo_raster <- annual_climatology(
-  meteo_brick = b_dly_prec,
+  meteo_brick = prec_brick,
   poly_station = poly_posto
 )
 meteo_raster
