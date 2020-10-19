@@ -30,9 +30,8 @@
 #'
 z_bands <- function(z, dz = 100, nbands = NULL){
 
-  checkmate::assert(
-    checkmate::check_null(dz),
-    checkmate::check_null(nbands)
+  checkmate::assert_false(
+    is.null(dz) && is.null(nbands)
   )
 
   if(is.null(nbands)) checkmate::assert_number(dz)
