@@ -4,7 +4,13 @@
 \alias{elev_bands}
 \title{Fraction of precipitation and catchment area by elevation bands}
 \usage{
-elev_bands(con_dem, meteo_raster = NULL, dz = 100, nbands = NULL)
+elev_bands(
+  con_dem,
+  meteo_raster = NULL,
+  dz = 100,
+  nbands = NULL,
+  quiet = FALSE
+)
 }
 \arguments{
 \item{con_dem}{raster of conditioned elevation of catchment}
@@ -17,6 +23,8 @@ area distributions within 100 m elevation by default.}
 
 \item{nbands}{numeric scalar. Default: NULL (use \code{dz} to build elevation
 bands).}
+
+\item{quiet}{Hide messages (FALSE, the default), or display them.}
 }
 \value{
 a \link[tibble:tibble-package]{tibble} with fraction of precipitation

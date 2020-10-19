@@ -2,7 +2,9 @@
 title: "Pré-processamento dos dados de entrada para o FUSE"
 author: "Jônatan Tatsch"
 date: '`r Sys.Date()`'
-output: rmarkdown::html_vignette
+output:
+    bookdown::html_document2:
+      base_format: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{pre-proc-data-fuse}
   %\VignetteEngine{knitr::rmarkdown}
@@ -17,46 +19,205 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Introdução 
+# Introdução 
 
-O pacote **`{fuse.prep}`** prepara os dados de elevação do terreno e de forçantes hidrometeorológicas necessários para criação dos arquivos NetCDF de entrada do FUSE para uma bacia hidrográfica (BH). 
+O pacote **`{fuse.prep}`** prepara os dados de elevação do terreno e de forçantes hidrometeorológicas necessários para criação dos arquivos NetCDF de entrada do FUSE para uma bacia hidrográfica (**BH**). 
 
 Nesta vinheta descreve-se o pré-processamento dos dados necessários para geração 
-do arquivo NetCDF de bandas de elevação do terreno. 
+do arquivo NetCDF de bandas de elevação do terreno. Este processo é ilustrado 
+na Figura \@ref(fig:fluxograma).
 
-## Pré-requisitos
+```{r, echo = FALSE, eval = FALSE}
+## Colar texto abaixo em
+# https://mermaid-js.github.io/mermaid-live-editor
+## e Download svg
 
-### Pacotes 
+## referência
+# https://mermaid-js.github.io/mermaid/diagrams-and-syntax-and-examples/flowchart.html
 
-```{r setup}
-library(HEgis)
-#library(HEobs)
-library(fuse.prep)
+#library(DiagrammeR)
+#univar_flowchart = "
+graph TD
+    A1[(CON Hydrosheds)] -->|sa_con_3s_hydrosheds.gr*| A2[extract_condem]
+    A2 --> |con_dem| Z[elev_bands_nc]
+    subgraph HEgis
+    C1[/Parte do nome do posto/] -->|name_regex| C2[info_station]
+    C2 --> |station| C3[extract_poly]
+    end
+    C3 -->|poly_station| A2
+    C3 -->|poly_station| F[annual_climatology]
+    C3 -->|poly_station| C4[centroids]
+    C4 --> |ccords| Z
+    
+    B1[(Dados climaticos Brasil)] --> |brick-prec-25km-19800101-20151231.nc| B2[import_nc]
+    B2 --> |meteo_brick| F
+    F --> |meteo_raster| Z
+
+style C4 stroke:#333,stroke-width:4px
+style F stroke:#333,stroke-width:4px
+style A2 stroke:#333,stroke-width:4px
+#"
+#mermaid(diagram = univar_flowchart, width = 800, height = 800)
 ```
 
-### Dados
+```{r fluxograma, echo = FALSE, fig.align='center', fig.cap="Fluxo de pré-processamento dos dados necessários para criação do NetCDF de bandas de elevação. A região em amarelo indica os processos feitos com o pacote **`{HEgis}`**. Os demais são feitos com o **`{fuse.prep}`**."}
+knitr::include_graphics("mermaid-diagram-20201018162221.svg")
+```
 
-A função `elev_bands_nc()` cria o arquivo NetCDF de bandas de elevação e requer os seguintes dados como entrada:
+
+
+
+# Pré-requisitos
+
+## Pacotes 
+
+```{r pcks, message=FALSE, warning=FALSE}
+library(HEgis)
+library(fuse.prep)
+library(raster)
+library(dplyr)
+```
+
+# Base de dados
+
+Para demonstrar o pré-processamento dos dados são usadas duas (grandes) base de dados:
+
+1. Modelo de elevação do terreno hidrologicamente consistente (CON) da base de dados [Hydrosheds](https://www.hydrosheds.org/downloads) para América do Sul com resolução espacial de aproximadamente 90 m. 
+
+2. Dados diários gradeados de variáveis meteorológicas para o Brasil ([Xavier et al 2017](https://proceedings.science/sbsr/papers/an-update-of-xavier--king-and-scanlon--2016--daily-precipitation-gridded-data-set-for-the-brazil), [Xavier et al. 2016](https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.4518)) 
+
+A primeira base de dados é distribuída em [arquivos](https://www.dropbox.com/sh/hmpwobbz9qixxpe/AACTtHDeeLRNOK8_DfZbLHUWa/HydroSHEDS_CON/CON_3s_BIL/sa_con_3s_zip_bil?dl=0&subfolder_nav_tracking=1) divididos em *tiles* que cobrem quase todo o globo. Estes arquivos foram combinados em único arquivo (15 GB) para Amérca do Sul no formato nativo do pacote raster (`sa_con_3s_hydrosheds.grd`) e pode ser baixado  [aqui](https://www.dropbox.com/sh/1agi2378wckr6c3/AAAu2_IBc_9LWTdzvA52VL-Ja?dl=0) [^1]. Este arquivo pode ser baixado manualmente no diretório onde está sendo realizada a preparação de dados para o FUSE. Recomenda-se armazenar os dados em um sub-diretório nomeado `input`.
+
+
+A segunda base de dados é distribuída em [arquivos NetCDF](https://utexas.app.box.com/v/Xavier-etal-IJOC-DATA/) divididos por décadas. Os arquivos dos dados diários de precipitação e evapotranspiração de referência foram combinados em único arquivo NetCDF (1.5 GB para cada variável) e podem ser baixados  [aqui](https://www.dropbox.com/s/hj6bu183myfor9y/brick-prec-25km-19800101-20151231.nc?dl=1) [^1] e [aqui](https://www.dropbox.com/s/jfsehx65g0z8yjo/brick-ETo-25km-19800101-20171231.nc?dl=1), respectivamente. O trecho de código abaixo utiliza a função `import_c` que faz o download dos arquivos NetCDF de cada variável e retorna o caminho de acesso aos arquivos baixados.
+
+[^1]: Certifique-se da disponibilidade de espaço para armazenamento dos dados em disco.
+
+```{r, eval = FALSE}
+(nc_files <- meteo_nc(c("prec", "et0"), dest_dir = "input"))
+```
+
+
+## Exemplo de dados
+
+O pré-processamento de dados requeridos pela função que cria o arquivo NetCDF de bandas de elevação (`elev_bands_nc()`) consiste nos processos representados pelos retângulos com linha mais grossa na Figura \@ref(fig:fluxograma). Este exemplo de pré-processamento são do posto da **UHE Governador Bento Munhoz da Rocha Neto**, identificada pelo código 74, e incluem:
  
-- raster do modelo de elevação do terreno recortado e com máscara para BH. Um exemplo de dados é o `condem74` no pacote **`{HEgis}`**
+- `con_dem`: raster do modelo de elevação do terreno recortado e com máscara para BH. Um exemplo de dados é o `condem74` no pacote **`{HEgis}`** e resulta da função `extract_condem()`.
 
-```{r}
+```{r con_dem}
 condem74
 ```
 
-- raster da climatologia anual de uma variável meteorológica (e.g. precipitação, temperatura, evapotranspiração potencial). Um exemplo de dados é o `precclim74` no pacote **`{HEgis}`**
+- `ccoords`: *tibble* ou *data frame* com as coordenadas do centróide do polígono da BH. Estas coordenadas resultam da função `centroids()` que requer o polígono da BH (p.ex: `poly74` no pacote `HEgis`).
 
-```{r}
-precclim74
-```
-
-- coordenadas do centróide do polígono da BH. Estas coordenadas resutam da função `centroids()` que requer o polígono da BH. Um exemplo de dado deste tipo é o `poly74` no pacote `HEgis`.
-
-```{r}
+```{r ccoords}
 poly74
 ```
 
+- raster da climatologia anual de uma variável meteorológica (e.g. precipitação, temperatura, evapotranspiração potencial). Um exemplo de dados é o `precclim74` no pacote **`{HEgis}`** e resulta da função `annual_climatology()`.
+
+```{r meteo_raster}
+precclim74
+```
 
 
+# Pré-processamento
 
+Agora nós vamos mostrar como obter os dados listados na seção anterior.
+
+
+## Centróide da BH (`ccoords`)
+
+As coordenadas do centróide da BH usado de entrada da função `elev_bands_nc(..., ccoords)` são obtidas no código abaixo seguindo o fluxograma desta etapa (coluna central da Figura \@ref(fig:fluxograma)).
+
+```{r ccoords-flux}
+# parte do nome do posto da UHE
+parte_nome <- "MUNHOZ" 
+# polígono do posto
+poly_posto <- parte_nome %>%
+  # informações do posto
+  info_station(name_regex = .) %>%
+  # acessa valor da coluna posto
+  pull(posto) %>%
+  # extrai plígono do posto
+  extract_poly(station = .)
+# centróides do polígono do posto
+(ccoords <- centroids(poly_station = poly_posto))
+```
+
+## Elevação do terreno da BH (`con_dem`)
+
+O raster de entrada da função `elev_bands_nc(con_dem, ...)` é o obtido no código abaixo seguindo o fluxograma desta etapa (primeira coluna da Figura \@ref(fig:fluxograma)).
+
+```{r path_hs, eval = FALSE}
+path_hs <- "input/sa_con_3s_hydrosheds.grd"
+```
+
+```{r path_hs_e, echo = FALSE}
+path_hs <- "~/Dropbox/datasets/GIS/hydrosheds/sa_con_3s_hydrosheds.grd"
+```
+
+
+```{r con_dem-flux}
+con_hs <- raster(path_hs)
+con_dem <- extract_condem(condem = con_hs, poly_station = poly_posto)
+con_dem
+```
+
+
+## Climatologia da precipitação anual (`meteo_raster`)
+
+O raster de entrada da função `elev_bands_nc(..., meteo_raster)` é o obtido no código abaixo seguindo o fluxograma desta etapa (última coluna da Figura \@ref(fig:fluxograma)).
+
+```{r meteo_raster-flux}
+# lê arquivo de prec diária ou faz download se ele não estiver no dest_dir
+b_dly_prec <- import_nc(
+  varnc = "prec",
+  dest_dir = "input"
+)
+# climatologia anual na BH
+meteo_raster <- annual_climatology(
+  meteo_brick = b_dly_prec,
+  poly_station = poly_posto
+)
+meteo_raster
+```
+
+# Criação do NetCDF de bandas de elevação
+
+Com os dados pré-processados temos os principais dados de entrada da função `elev_bands_nc()`. Então podemos gerar o arquivo NetCDF de bandas de elevação 
+para o posto 74, usando 14 bandas de elevação usando o código:
+
+```{r dest-nc-eb, eval = FALSE}
+# altere aqui se desejar
+dest_eb_file <- "output/posto74_elevation_bands.nc" 
+```
+
+```{r dest-nc-eb-actual, echo = FALSE}
+dest_eb_file <- file.path(tmpDir(), "posto74_elevation_bands.nc")
+```
+
+```{r}
+elev_bands_file <- elev_bands_nc(
+  con_dem,
+  meteo_raster,
+  dz = NULL,
+  nbands = 14,
+  ccoords,
+  file_nc = dest_eb_file,
+  na = -9999,
+  force_v4 = TRUE,
+  quiet = TRUE
+)
+```
+
+```{r, eval = FALSE}
+elev_bands_file
+```
+
+```{r, echo = FALSE}
+(dest_eb_file <- "output/posto74_elevation_bands.nc")
+```
+
+Para detalhes sobre a função `elev_bands_nc()` consulte o help (`?elev_bands_nc`).
 

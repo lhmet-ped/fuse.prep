@@ -15,7 +15,8 @@ elev_bands_nc(
   ccoords,
   file_nc = "inst/extdata/posto74_elevation_bands.nc",
   na = -9999,
-  force_v4 = TRUE
+  force_v4 = TRUE,
+  quiet = FALSE
 )
 }
 \arguments{
@@ -42,6 +43,8 @@ and \code{lat}.}
  cannot be read by version 3 of the netcdf library).  If FALSE, then the file is created
  in netcdf version 3 format UNLESS the user has requested features that require version 4.
  Deafult is FALSE.}
+
+\item{quiet}{Hide messages (FALSE, the default), or display them.}
 }
 \value{
 character, path to the NetCDF file.
