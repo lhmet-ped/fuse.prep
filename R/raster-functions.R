@@ -138,6 +138,9 @@ annual_summary <- function(meteo_brick, fun){
 #'@inheritParams spatial_average
 #' @param fun function to apply. Default: sum.
 #' @param ref_crs character, coordinate reference system.
+#' @param cutoff numeric scalar, Default: 0. Value below which data will be
+#' replaced by NA. It is useful to exclude zeroes when plotting annual
+#' precipitation fields.
 #' @return \code{\link[raster]{raster}} with the Mean annual climatology of
 #' meteorological field.
 #' @export
@@ -146,7 +149,8 @@ annual_climatology <- function(meteo_brick = import_nc(varnc = "prec", dest_dir 
                          fun = sum,
                          #save = TRUE,
                          #dest_dir = "output",
-                         ref_crs = "+proj=longlat +datum=WGS84") {
+                         ref_crs = "+proj=longlat +datum=WGS84",
+                         cutoff = 0) {
 
   # meteo_brick = b_prec; poly_station = poly74; ref_crs = "+proj=longlat +datum=WGS84"
 
@@ -167,6 +171,7 @@ annual_climatology <- function(meteo_brick = import_nc(varnc = "prec", dest_dir 
   #plot(clim_summary)
 
   clim_summary <- raster::mask(clim_summary, sf::as_Spatial(poly_station))
+  clim_summary[clim_summary <= cutoff] <- NA
   clim_summary
 }
 

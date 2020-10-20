@@ -9,7 +9,7 @@ precclim74 <- fuse.prep::annual_climatology(
 )
 #plot(precclim74)
 #! This is acceptable only for annual totals
-precclim74[precclim74 == 0] <- NA
+precclim74[precclim74 <= 0] <- NA
 #precclim74 <- raster::mask(precclim74, poly74)
 #plot(precclim74)
 #plot(sf::st_geometry(poly74), add = TRUE)
