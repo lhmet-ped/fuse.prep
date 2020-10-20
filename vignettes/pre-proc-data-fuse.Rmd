@@ -80,7 +80,7 @@ style fuse.prep fill:#FFFFFF,stroke:#333,stroke-width:2px
 #mermaid(diagram = univar_flowchart, width = 800, height = 800)
 ```
 
-```{r fluxograma, echo = FALSE, fig.align='center', fig.cap="Fluxo de pré-processamento dos dados necessários para criação do NetCDF de bandas de elevação. A região em amarelo indica os processos feitos com o pacote **`{HEgis}`**. Os demais são feitos com o **`{fuse.prep}`**."}
+```{r fluxograma, echo = FALSE, fig.align='center', fig.cap="Fluxo de pré-processamento dos dados necessários para criação do NetCDF de bandas de elevação. A região em amarelo indica os processos feitos com o pacote **`{HEgis}`**. Os demais são feitos com o **`{fuse.prep}`**.", out.width='95%'}
 knitr::include_graphics("mermaid-diagram-20201019171247.svg")
 ```
 

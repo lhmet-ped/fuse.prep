@@ -8,7 +8,8 @@ annual_climatology(
   meteo_brick = import_nc(varnc = "prec", dest_dir = "input"),
   poly_station,
   fun = sum,
-  ref_crs = "+proj=longlat +datum=WGS84"
+  ref_crs = "+proj=longlat +datum=WGS84",
+  cutoff = 0
 )
 }
 \arguments{
@@ -21,6 +22,10 @@ annual_climatology(
 \item{fun}{function to apply. Default: sum.}
 
 \item{ref_crs}{character, coordinate reference system.}
+
+\item{cutoff}{numeric scalar, Default: 0. Value below which data will be
+replaced by NA. It is useful to exclude zeroes when plotting annual
+precipitation fields.}
 }
 \value{
 \code{\link[raster]{raster}} with the Mean annual climatology of
