@@ -199,7 +199,8 @@ prec_brick <- import_nc(
 # climatologia anual na BH
 meteo_raster <- annual_climatology(
   meteo_brick = prec_brick,
-  poly_station = poly_posto
+  poly_station = poly_posto, 
+  cutoff = 0
 )
 meteo_raster
 ```
