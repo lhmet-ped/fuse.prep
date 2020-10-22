@@ -1,7 +1,6 @@
 # fuse.prep (development version)
 
-
-- [ ] incluir vinheta para gerar dados processados usados na `meteo_forcing_nc()`
+- [ ] incluir vinheta do pré-processamento de dados das forçantes meteorológicas
 
 - [ ] incluir testes para `spatial_average`, `annual_climatology`, `annual_summary`
 
