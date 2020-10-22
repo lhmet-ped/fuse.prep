@@ -1,8 +1,11 @@
-# fuse.prep 0.0.4
+# fuse.prep (development version)
+
 
 - [ ] incluir vinheta para gerar dados processados usados na `meteo_forcing_nc()`
 
 - [ ] incluir testes para `spatial_average`, `annual_climatology`, `annual_summary`
+
+# fuse.prep 0.0.4
 
 - [x] adicionar `join_netcdfs.R` ao `data-raw`
 
