@@ -15,7 +15,7 @@
 #' }
 #'
 #'@docType package
-#'@name fuse.prep
+#'@name fuse.prep-package
 #'
 # The following block is used by usethis to automatically manage
 # roxygen namespace tags. Modify with care!
