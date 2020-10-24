@@ -5,7 +5,12 @@
 \title{Save average precipitation or evapotranspiration over upstream drainage
 area of a ONS station}
 \usage{
-spatial_average(meteo_brick, poly_station, fun = mean)
+spatial_average(
+  meteo_brick,
+  poly_station,
+  fun = mean,
+  var_name = c("pr", "pet")
+)
 }
 \arguments{
 \item{meteo_brick}{\code{\link[raster]{brick}} of meteorological field
@@ -15,6 +20,8 @@ spatial_average(meteo_brick, poly_station, fun = mean)
 \code{\link[raster]{extent}}.}
 
 \item{fun}{function to apply. Default: mean.}
+
+\item{var_name}{character, variable name.}
 }
 \value{
 a character path to the RDS file with a \code{\link[tibble]{tibble}}
