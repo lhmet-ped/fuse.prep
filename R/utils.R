@@ -17,7 +17,10 @@ utils::globalVariables(
     ".",
     "X",
     "Y",
-    "name"
+    "name",
+    "posto",
+    "pr",
+    "pet"
   )
 )
 
@@ -57,7 +60,7 @@ utils::globalVariables(
 #' "m^3/sec".
 #' @source hydromad r package
 #' @author Felix Andrews felix@nfrac.org
-#' @return
+#' @return numeric vector with flow in the new units
 #' @export
 #'
 #' @examples
