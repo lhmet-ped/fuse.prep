@@ -28,7 +28,8 @@ Imports:
     tibble,
     utils,
     purrr,
-    lhmetools
+    lhmetools,
+    HEobs
 Suggests: 
     testthat,
     knitr,
