@@ -1,3 +1,52 @@
+#-------------------------------------------------------------------------------
+#' Join hydrometeorological data for FUSE and convert streamflow from cumecs
+#' to mm/day.
+#'
+#' @param prec a \code{\link[tibble]{tibble}} with daily precipitation (mm day^-1^)
+#' @param et0 a \code{\link[tibble]{tibble}} with daily reference evapotranspiration (mm day^-1^)
+#' @param qnat a \code{\link[tibble]{tibble}} with daily natural streamflow (cumecs)
+#' @param area area (in square kilometres) that flow volume is averaged
+#' over.
+#' @return a \code{\link[tibble]{tibble}}
+#' @export
+#'
+comb_data <- function(prec, et0, qobs, area,
+                      save = TRUE,
+                      prefix = "hydrodata-posto-",
+                      dest_dir = "output"
+){
+ # prec = prec_posto; et0 = pet_posto; qobs = qobs_posto; area = area_posto; stn_id = 74
+  hydrodata <- prec %>%
+    dplyr::inner_join(et0, by = c("date", "posto")) %>%
+    dplyr::inner_join(qobs, by = c("date", "posto"))
+
+
+  hydrodata <- hydrodata %>%
+  dplyr::mutate(
+    qobs_mm = convert_flow(
+      # mudar no HEobs o nome qnat para qobs
+      dplyr::pull(dplyr::select(., -date, -posto, -pr, -pet)),
+      from = "m^3/sec",
+      to = "mm/day",
+      area.km2 = area
+    )
+  ) %>%
+    dplyr::rename("station" = "posto")
+
+  if(save){
+    hydrodata_file <- save_data(hydrodata,
+                                .prefix = prefix,
+                                .posto_id = hydrodata$station[1],
+                                .dest_dir = dest_dir
+    )
+    message(hydrodata_file)
+  }
+  hydrodata
+}
+
+
+
+#-------------------------------------------------------------------------------
 #' Check inputs
 #' @noRd
 #' @family forcings functions
