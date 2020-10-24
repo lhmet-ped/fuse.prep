@@ -53,6 +53,7 @@
 #' (e.g.: precipitation, evapotranspiration, etc).
 #' @param poly_station \code{\link[sf]{sf}} polygon of station catchment or a
 #' \code{\link[raster]{extent}}.
+#' @param var_name character, variable name.
 #' @param fun function to apply. Default: mean.
 #'
 #' @return a character path to the RDS file with a \code{\link[tibble]{tibble}}
@@ -60,7 +61,8 @@
 #'
 spatial_average <- function(meteo_brick,
                             poly_station,
-                            fun = mean
+                            fun = mean,
+                            var_name = c("pr", "pet")
                             #save = TRUE,
                             #dest_dir = "output"
                             ){
@@ -69,11 +71,11 @@ spatial_average <- function(meteo_brick,
   #plot(posto_poly)
   #plot(poly_posto, add = TRUE, bg = 2)
   posto_poly_b <- HEgis::prep_poly_posto(poly_station)
-  rm(poly_station)
+  #rm(poly_station)
   cb <- raster::crop(meteo_brick, posto_poly_b)
-
+  rm(poly_station_b)
   # need improvement
-  varnc_guess <- ifelse(max(raster::maxValue(meteo_brick)) > 20, "prec", "et0")
+  #varnc_guess <- ifelse(max(raster::maxValue(meteo_brick)) > 20, "prec", "et0")
 
   # média ponderada pela área da células dentro do polígono
   # não é a forma mais eficiente, mas faz o que precisa ser feito usando
@@ -81,7 +83,7 @@ spatial_average <- function(meteo_brick,
   # https://gis.stackexchange.com/questions/213493/area-weighted-average-raster-values-within-each-spatialpolygonsdataframe-polygon
   meteo_avg <- c(t(raster::extract(
     cb,
-    posto_poly_b,
+    poly_station,
     weights = TRUE,
     normalizeWeights = TRUE,
     fun
@@ -90,13 +92,13 @@ spatial_average <- function(meteo_brick,
   # range(prec_avg)
 
   meteo_tbl <- tibble::tibble(date = raster::getZ(meteo_brick),
-                              posto = as.integer(posto_poly_b$codONS),
+                              posto = as.integer(posto_poly$codONS),
                               meteovar = meteo_avg
   )
-  meteo_tbl <- stats::setNames(meteo_tbl, c("date", "posto", varnc_guess))
+  meteo_tbl <- stats::setNames(meteo_tbl, c("date", "posto", var_name))
 
 
-  #meteo_posto_file <- paste0(gsub("meteo", varnc_guess, "meteo-posto-"),
+  #meteo_posto_file <- paste0(gsub("meteo", var_name, "meteo-posto-"),
   #                           posto_poly$codONS, ".RDS"
   #)
 
@@ -108,7 +110,7 @@ spatial_average <- function(meteo_brick,
   # if(save){
   #   save_data(
   #     data_posto = meteo_tbl,
-  #     .prefix = gsub("meteo", varnc_guess, "meteo-posto-"),
+  #     .prefix = gsub("meteo", var_name, "meteo-posto-"),
   #     .posto_id = posto_poly_b$codONS[1],
   #     .dest_dir = dest_dir
   #   )
