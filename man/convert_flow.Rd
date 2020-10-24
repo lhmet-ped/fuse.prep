@@ -28,7 +28,7 @@ This must be given when converting between measures of depth and measures of vol
 \item{timestep.default}{the time step if not specified in from or to.}
 }
 \value{
-
+numeric vector with flow in the new units
 }
 \description{
 This function converts between units of flow (volumetric throughput),

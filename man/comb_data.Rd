@@ -20,10 +20,17 @@ comb_data(
 
 \item{et0}{a \code{\link[tibble]{tibble}} with daily reference evapotranspiration (mm day^-1^)}
 
+\item{qobs}{a \code{\link[tibble]{tibble}} with daily natural streamflow (cumecs)}
+
 \item{area}{area (in square kilometres) that flow volume is averaged
 over.}
 
-\item{qnat}{a \code{\link[tibble]{tibble}} with daily natural streamflow (cumecs)}
+\item{save}{logical, TRUE for export output data to a RDS file.}
+
+\item{prefix}{character, prefiz for the output file name.}
+
+\item{dest_dir}{a character with the name of where the data is to be
+saved.}
 }
 \value{
 a \code{\link[tibble]{tibble}}
