@@ -70,9 +70,10 @@ spatial_average <- function(meteo_brick,
   checkmate::assert_set_equal(c(class(meteo_brick)), "RasterBrick")
   #plot(posto_poly)
   #plot(poly_posto, add = TRUE, bg = 2)
-  posto_poly_b <- HEgis::prep_poly_posto(poly_station)
+  poly_station <- HEgis::prep_poly_posto(poly_station, dis.buf = 0)
+  poly_station_b <- HEgis::prep_poly_posto(poly_station)
   #rm(poly_station)
-  cb <- raster::crop(meteo_brick, posto_poly_b)
+  cb <- raster::crop(meteo_brick, poly_station_b)
   rm(poly_station_b)
   # need improvement
   #varnc_guess <- ifelse(max(raster::maxValue(meteo_brick)) > 20, "prec", "et0")
@@ -92,7 +93,7 @@ spatial_average <- function(meteo_brick,
   # range(prec_avg)
 
   meteo_tbl <- tibble::tibble(date = raster::getZ(meteo_brick),
-                              posto = as.integer(posto_poly$codONS),
+                              posto = as.integer(poly_station$codONS),
                               meteovar = meteo_avg
   )
   meteo_tbl <- stats::setNames(meteo_tbl, c("date", "posto", var_name))
