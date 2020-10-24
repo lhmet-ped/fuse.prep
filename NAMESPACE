@@ -3,6 +3,8 @@
 export("%>%")
 export(annual_climatology)
 export(centroids)
+export(comb_data)
+export(convert_flow)
 export(elev_bands)
 export(elev_bands_nc)
 export(import_nc)
