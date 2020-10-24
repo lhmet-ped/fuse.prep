@@ -1,0 +1,271 @@
+---
+title: "Pré-processamento dos dados das forçantes meteorológicas"
+author: "Jônatan Tatsch"
+date: '`r Sys.Date()`'
+output:
+    bookdown::html_document2:
+      base_format: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Pré-processamento dos dados das forçantes meteorológicas}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introdução 
+
+O pacote **`{fuse.prep}`** prepara os dados de elevação do terreno e de forçantes hidrometeorológicas necessários para criação dos arquivos NetCDF de entrada do FUSE para uma bacia hidrográfica (**BH**). 
+
+Nesta vinheta descreve-se o pré-processamento dos dados necessários para geração 
+do **arquivo NetCDF das forçantes meteorológicas**. Este processo é ilustrado 
+na Figura \@ref(fig:fluxograma-fm).
+
+```{r mermaid, echo = FALSE, eval = FALSE}
+## Colar texto abaixo em
+# https://mermaid-js.github.io/mermaid-live-editor
+## e Download svg
+## site referência 
+# https://mermaid-js.github.io/mermaid/diagrams-and-syntax-and-examples/flowchart.html
+## OBS: é possível utilizar mermaid direto no R com o pacote DiagrammeR, mas
+## há somente alguns 
+#univar_flowchart = "
+graph TD
+   DCB[(Dados Meteorológicos BR)] --> |brick-prec-25km-19800101-20151231.nc| INC[import_nc]
+   DCB[(Dados Meteorológicos BR)] --> |brick-ET0-25km-19800101-20151231.nc| INC[import_nc] 
+  subgraph fuse.prep
+%%    subgraph HEgis
+%%       IP[/info_posto/]
+%%       IP --> |posto| C3[extract_poly]
+%%       C3 --> PS[/poly_station/] 
+%%    end
+
+     subgraph HEgis
+      C1[/Parte do nome do posto/] -->|name_regex| C2[info_station]
+      C2 --> IP[/info_posto/]
+      IP --> |posto| C3[extract_poly]
+      C3 --> PS[/poly_posto/] 
+     end
+
+    PS --> |poly_station| SA[spatial_average]
+    PS -->|id| DQN
+     subgraph HEobs
+       DQ[(Dados Vazão Natural)] --> |VazoesNaturaisONS_D_87UHEsDirceuAssis_2018| DQN[extract_qnat]
+     end
+
+     INC --> PB[/prec_brick/]
+     INC --> ETB[/et0_brick/]
+      PB --> SA
+      ETB --> SA
+       SA --> PP[\prec_posto\]
+       SA --> EP[\et0_posto\]
+        PP --> CD
+        EP --> CD
+   PS --> |área| CD[comb_data]
+   DQN --> CD 
+   CD --> MFNC[meteo_forcing_nc]
+  end  
+    
+style CD stroke:#333,stroke-width:4px
+style fuse.prep fill:#FFFFFF,stroke:#333,stroke-width:2px
+style HEobs fill:#FCC,stroke:#F00,stroke-width:2px
+		
+		
+#"
+#mermaid(diagram = univar_flowchart, width = 800, height = 800)
+```
+
+```{r fluxograma-fm, echo = FALSE, fig.align='center', fig.cap="Fluxo de pré-processamento dos dados necessários para criação do NetCDF das Forçantes Meteorológicas. A região em amarelo indica os processos feitos com o pacote **`{HEgis}`** e em XXX pelo pacote  **`{HEobs}`**", out.width='95%'}
+knitr::include_graphics("mermaid-diagram-forcs.svg")
+```
+
+
+
+
+# Pré-requisitos
+
+## Pacotes 
+
+```{r pcks, message=FALSE, warning=FALSE}
+library(HEgis)
+library(HEobs)
+library(lhmetools)
+library(fuse.prep)
+library(raster)
+library(dplyr)
+library(fs)
+```
+
+## Base de dados
+
+Para demonstrar o pré-processamento dos dados precisamos de uma base de dados meteorológicos observados sobre a região da BH de interesse. Para BH com área de drenagem totalmente dentro do território nacional a base de dados diários gradeados de variáveis meteorológicas para o Brasil ([Xavier et al 2017](https://proceedings.science/sbsr/papers/an-update-of-xavier--king-and-scanlon--2016--daily-precipitation-gridded-data-set-for-the-brazil), [Xavier et al. 2016](https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.4518)) é uma opção atrativa para fins de pesquisa.
+
+Esta base de dados também foi usada no pré-processamento dos dados necessários para a geração do arquivo NetCDF das bandas de elevação (ver vinheta [pré-processamento do arquivo de bandas de elevação](pp-elevbands.html)).
+
+[^1]: Certifique-se da disponibilidade de espaço para armazenamento dos dados em disco.
+
+```{r, eval = FALSE}
+(nc_files <- meteo_nc(c("prec", "et0"), dest_dir = "input"))
+```
+
+
+## Exemplo de dados pré-processados
+
+A função chave do pré-processamento dos dados necessários para criação do arquivo NetCDF das forçantes meteorológicas é a `comb_data()`, retângulo com linha mais grossa na Figura \@ref(fig:fluxograma-fm). A saída desta função é um *tibble*, ou *data frame*, com as séries temporais das variáveis meteorológicas disponíveis para a BH de interesse (pelo menos precipitação, evapotranspiração potencial e vazão observada). Esta tabela é usada como entrada na função `meteo_forcing_nc()` para gerar o arquivo NetCDF de entrada para o FUSE. Um exemplo destes dados como este é o `forcdata74`, disponibilizado com o **`{fuse.prep}`**. Estes dados, assim como os usados na vinheta do pré-processamento do arquivo de bandas de elevação, referem-se a médias na área da bacia hidrográfica do posto 74 do ONS.
+
+```{r con_dem}
+forcdata74
+```
+
+# Pré-processamento
+
+Agora veremos como obter os dados da seção anterior, seguindo o fluxo de 
+trabalho da Figura \@ref(fig:fluxograma-fm). 
+
+
+## Polígono da BH (`poly_station`)
+
+A etapa de pré-processamento relacionada
+ao pacote HEgis é omitida aqui pois já foi descrita na vinheta de [pré-processamento do arquivo de bandas de elevação](pp-elevbands.html). O produto pré-processado nesta etapa é o `poly_posto` que corresponde aos dados `poly74` distribuído no pacote **`{HEgis}`**.
+
+```{r poly-posto}
+(poly_posto <- poly74)
+```
+
+A partir do polígono da BH, obtemos as demais informações: o código 
+identificador e a área (km^2^) da BH.
+
+```{r info-posto}
+(id_posto <- poly_posto$codONS)
+(area_posto <- poly_posto$adkm2)
+```
+
+Estas informações são usadas posteriormente como entrada das funções `extract_qnat()` e `comb_data()` (Figura \@ref(fig:fluxograma-fm)), respectivamente.
+
+
+## Vazão observada (`qobs_posto`)
+
+Os dados de vazão observada para a BH de interesse são obtidos da base de dados de vazão natural da ONS. Podemos baixar estes dados usando o código abaixo que salvará a base de dados no sub-diretório `inst/extdata` do diretório de instalação do pacote `HEobs` (obtido digitando no console do R `system.file(package = "HEobs")`). 
+
+```{r set-down}
+dropbox_link <- "https://www.dropbox.com/s/d40adhw66uwueet/VazoesNaturaisONS_D_87UHEsDirceuAssis_2018.dat?dl=1"
+
+# diretório de destino dentro do sub-diretório 'extdata' do pacote HEobs
+dest_dir <- system.file(package = "HEobs") %>%
+  path("inst/extdata")
+dir_create(dest_dir)
+#dir_exists(dest_dir)
+
+# nome do aruivo
+dest_file <- dropbox_link %>% 
+  path_ext_remove() %>%
+  path_file() %>%
+  paste0(".dat") %>%
+  path(dest_dir, .)
+
+# faz download se o arquivo não existir
+if(!file_exists(dest_file)){
+ download.file(dropbox_link, dest_file, mode = "wb")  
+}
+```
+
+A função `extract_qnat()` do pacote **`{HEobs}`**, extrai da base de dados de vazão natural os dados da BH de interesse.
+
+```{r down-qnat}
+qobs_posto <- extract_qnat(
+  qnat_file = dest_file,
+  stn_id = id_posto,
+  save = FALSE
+)
+qobs_posto
+```
+
+
+## Médias das forçantes meteorológicas na área da BH
+
+Os dados diários meteorógicos gradeados de precipitação (`prec`) e evapotranspiraçã (`et0`) potencial são importados (ou baixados[^1] se eles não forem encontrados no diretório especificado em `dest_dir`) com o código abaixo.
+
+[^1]: O download de cada arquivo NetCDF pode demorar e requer **1.5 GB!** de espaço. Se você optar por baixar manualmente cada arquivo, não altere o nome original dos arquivos. As datas são derivadas a partir do nome dos arquivos.
+
+```{r meteo_raster-flux}
+# lê arquivo de prec diária ou faz download se ele não estiver no dest_dir
+prec_brick <- import_nc(
+  varnc = "prec",
+  dest_dir = system.file("extdata", package = "fuse.prep")
+)
+et0_brick <- import_nc(
+  varnc = "et0",
+  dest_dir = system.file("extdata", package = "fuse.prep")
+)
+```
+
+A função `spatial_average()` determina a média da variável meteorológica sobre a área da BH. Os nomes padrões das variáveis no FUSE  são `pr` para precipitação e `pet` para evapotranspiração potencial. Por isso, usamos estes nomes no argumento `var_name` que armazenará o nome da variável que será escrita no NetCDF.  
+
+```{r}
+prec_posto <- spatial_average(
+  meteo_brick = prec_brick, 
+  poly_station = poly_posto, 
+  var_name = "pr",
+  fun = mean
+)
+prec_posto
+```
+
+```{r}
+pet_posto <- spatial_average(
+  meteo_brick = et0_brick, 
+  poly_station = poly_posto, 
+  var_name = "pet",
+  fun = mean
+)
+pet_posto
+```
+
+
+Os dados pré-processados (`prec_posto`, `pet_posto`, `qobs_posto`) são então combinados para serem usados na criação do NetCDF das forçantes meteorológicas.
+
+```{r}
+meteo_data <- comb_data(
+  prec = prec_posto,
+  et0 = pet_posto,
+  qobs = qobs_posto,
+  area = area_posto,
+  save = TRUE,
+  prefix = "meteo-data-posto-",
+  dest_dir = system.file("extdata", package = "fuse.prep")
+)
+meteo_data
+```
+
+
+# Criação do NetCDF das forçantes meteorológicas
+
+ temos os principais dados de entrada da função `elev_bands_nc()`. Então podemos gerar o arquivo NetCDF das forçantes meteorológicas 
+para o posto 74, usando 14 bandas de elevação usando o código:
+
+
+Para detalhes sobre a função `elev_bands_nc()` consulte o help (`?elev_bands_nc`).
+
+```{r}
+# arquivo de saída
+forcings_nc <- "extdata" %>%
+  system.file(package = "fuse.prep") %>%
+  path("posto74_input.nc")
+# exporta dados para netcdf
+meteo_forcing_nc(
+  pr = meteo_data[["pr"]],
+  pet = meteo_data[["pet"]],
+  q_obs = meteo_data[["qnat"]],
+  dates = meteo_data[["date"]],
+  ccoords = centroids(poly_station = poly_posto),
+  file_nc = forcings_nc 
+)
+file.exists(forcings_nc)
+```
+
