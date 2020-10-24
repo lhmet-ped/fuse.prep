@@ -4,9 +4,13 @@
 #'
 #' @param prec a \code{\link[tibble]{tibble}} with daily precipitation (mm day^-1^)
 #' @param et0 a \code{\link[tibble]{tibble}} with daily reference evapotranspiration (mm day^-1^)
-#' @param qnat a \code{\link[tibble]{tibble}} with daily natural streamflow (cumecs)
+#' @param qobs a \code{\link[tibble]{tibble}} with daily natural streamflow (cumecs)
 #' @param area area (in square kilometres) that flow volume is averaged
 #' over.
+#' @param save logical, TRUE for export output data to a RDS file.
+#' @param dest_dir a character with the name of where the data is to be
+#' saved.
+#' @param prefix character, prefiz for the output file name.
 #' @return a \code{\link[tibble]{tibble}}
 #' @export
 #'
