@@ -1,8 +1,15 @@
+
 # fuse.prep (development version)
 
-- [ ] incluir vinheta do pré-processamento de dados das forçantes meteorológicas
+- [ ] `comb_data` deve receber a tabela de dados e selecionar as variáveis de
+interesse, ao invés de receber vetores de cada variável.
 
 - [ ] incluir testes para `spatial_average`, `annual_climatology`, `annual_summary`
+
+# fuse.prep 0.0.4.91
+
+- [x] incluir vinheta do pré-processamento de dados das forçantes meteorológicas
+
 
 # fuse.prep 0.0.4
 
