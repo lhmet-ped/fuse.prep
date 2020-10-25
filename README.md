@@ -16,9 +16,11 @@ para o FUSE:
   - bandas de elevação do terreno: armazena as frações de área da bacia
     hidrográfica e da precipitação anual por banda de elevação;
 
-  - forçantes meteorológicas: armazena dados diários de temperatura do
-    ar, precipitação, evapotranspiração potencial e opcionalmente de
-    vazão observada;
+  - forçantes meteorológicas: armazena as séries temporais da média
+    diárias na área da bacia hidrográfica das variáveis: temperatura do
+    ar (°C), precipitação (mm dia<sup>-1</sup>), evapotranspiração
+    potencial (mm dia<sup>-1</sup>) e opcionalmente de vazão observada
+    (ou deflúvio, mm dia<sup>-1</sup>);
 
 ## Instalação
 
@@ -27,10 +29,14 @@ com:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("lhmet-ped/fuse.prep")
+devtools::install_github("lhmet-ped/fuse.prep", build_vignettes = TRUE)
 ```
 
-### Arquivo NetCDF de bandas de elevação
+A opção `build_vignettes = TRUE` instalará o pacote incluindo as
+vinhetas do pacote que apresentam as etapas de pré-processamento dos
+dados necessários para criação dos arquivos NetCDF.
+
+### NetCDF de bandas de elevação
 
 Os dados de exemplo são da Bacia Hidrográfica associada ao posto 74 (UHE
 G.B. MUNHOZ). Os dados necessários para geração do arquivo NetCDF de
@@ -78,8 +84,9 @@ precclim74
 #> values     : 1444.804, 2400.077  (min, max)
 ```
 
-Para saber como estes 3 arquivos foram gerados veja a vinheta do pacote
-(`vignette(asd)`).
+Para saber como estes 3 arquivos foram gerados consulte a vinheta de
+*Pré-processamento dos dados de bandas de elevação* digitando
+`vignette('pp-elevbands', package = "fuse.prep")`.
 
 O arquivo NetCDF de bandas de elevação é gerado com a função
 `elev_bands_nc()` que requer como entrada os dados carregados acima e o
@@ -95,28 +102,31 @@ obtido com a função `centroids()`.
 ```
 
 ``` r
+# arquivo de saída - altere o caminho para o local desejado
+ elevbands_nc <- file.path(tempdir(), "posto74_elevation_bands.nc")
+
 elev_bands_file <- elev_bands_nc(
   con_dem = condem74, 
   meteo_raster = precclim74, 
   nbands = 14,
   ccoords = poly_ctrd,
-  file_nc = file.path(tempdir(), "posto74_elevation_bands.nc"),
+  file_nc = elevbands_nc,
   na = -9999
 )
 #>   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================================                  |  75%  |                                                                              |======================================================================| 100%
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_bands_file
-#> [1] "/tmp/RtmpRvsEd0/posto74_elevation_bands.nc"
+#> [1] "/tmp/Rtmp6HU8sb/posto74_elevation_bands.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```
 
-## Arquivo NetCDF de forçantes meteorológicas
+## NetCDF das forçantes meteorológicas
 
 Para gerar o arquivo NetCDF com as séries temporais das forçantes
-hidrometeorológicas utilizaremos o conjunto de dados `forcdata74`
-disponibilizado neste pacote.
+hidrometeorológicas médias na área da BH, utilizaremos o conjunto de
+dados `forcdata74` disponibilizado com este pacote.
 
 ``` r
 forcdata74
@@ -136,14 +146,18 @@ forcdata74
 #> # … with 13,139 more rows
 ```
 
-Cada variável é passada como um vetor conforme a seguir. Os nomes dos
-vetores devem seguir este padrão: `pr` para precipitação, `pet` para
+Para saber como gerar estes dados consulte a vinheta de
+*Pré-processamento dos dados das forçantes meteorológicas* digitando
+`vignette('pp-forcmets', package = "fuse.prep")`.
+
+Cada variável é passada como um vetor conforme código abaixo. Os nomes
+dos vetores devem seguir este padrão: `pr` para precipitação, `pet` para
 evapotranspiração potencial e `q_obs` para vazão observada. Além das
 séries temporais das variáveis precisamos das datas, as coordenadas da
 bacia hidrográfica do posto e o arquivo NetCDF que será salvo.
 
 ``` r
-# arquivo de saída
+# arquivo de saída - altere o caminho para o local desejado
 forcings_nc <- "inst/extdata/posto74_input.nc"
 # exporta dados para netcdf
 meteo_forcing_nc(
