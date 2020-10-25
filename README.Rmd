@@ -100,6 +100,7 @@ if (requireNamespace("tidync", quietly = TRUE)) {
   # compara arquivo de exemplo do FUSE
   ref <- tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_elev_bands.nc") %>% hyper_tibble()
 }
+
 out
 ```
 

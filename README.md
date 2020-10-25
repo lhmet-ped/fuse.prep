@@ -117,7 +117,7 @@ elev_bands_file <- elev_bands_nc(
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_bands_file
-#> [1] "/tmp/Rtmp6HU8sb/posto74_elevation_bands.nc"
+#> [1] "/tmp/RtmpDfkH6U/posto74_elevation_bands.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```
