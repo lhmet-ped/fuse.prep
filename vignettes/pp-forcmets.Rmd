@@ -81,7 +81,7 @@ style HEobs fill:#FCC,stroke:#F00,stroke-width:2px
 #mermaid(diagram = univar_flowchart, width = 800, height = 800)
 ```
 
-```{r fluxograma-fm, echo = FALSE, fig.align='center', fig.cap="Fluxo de pré-processamento dos dados necessários para criação do NetCDF das Forçantes Meteorológicas. A região em amarelo indica os processos feitos com o pacote **`{HEgis}`** e em XXX pelo pacote  **`{HEobs}`**", out.width='95%'}
+```{r fluxograma-fm, echo = FALSE, fig.align='center', fig.cap="Fluxo de pré-processamento dos dados necessários para criação do NetCDF das Forçantes Meteorológicas. A região em amarelo indica os processos feitos com o pacote **`{HEgis}`** e em vermelho pelo pacote  **`{HEobs}`**", out.width='95%'}
 knitr::include_graphics("mermaid-diagram-forcs.svg")
 ```
 
@@ -106,7 +106,7 @@ library(fs)
 
 Para demonstrar o pré-processamento dos dados precisamos de uma base de dados meteorológicos observados sobre a região da BH de interesse. Para BH com área de drenagem totalmente dentro do território nacional a base de dados diários gradeados de variáveis meteorológicas para o Brasil ([Xavier et al 2017](https://proceedings.science/sbsr/papers/an-update-of-xavier--king-and-scanlon--2016--daily-precipitation-gridded-data-set-for-the-brazil), [Xavier et al. 2016](https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.4518)) é uma opção atrativa para fins de pesquisa.
 
-Esta base de dados também foi usada no pré-processamento dos dados necessários para a geração do arquivo NetCDF das bandas de elevação (ver vinheta [pré-processamento do arquivo de bandas de elevação](pp-elevbands.html)).
+Esta base de dados também foi usada no pré-processamento dos dados de bandas de elevação (ver vinheta **[Pré-processamento dos dados de bandas de elevação](pp-elevbands.html)**).
 
 [^1]: Certifique-se da disponibilidade de espaço para armazenamento dos dados em disco.
 
@@ -132,7 +132,7 @@ trabalho da Figura \@ref(fig:fluxograma-fm).
 ## Polígono da BH (`poly_station`)
 
 A etapa de pré-processamento relacionada
-ao pacote HEgis é omitida aqui pois já foi descrita na vinheta de [pré-processamento do arquivo de bandas de elevação](pp-elevbands.html). O produto pré-processado nesta etapa é o `poly_posto` que corresponde aos dados `poly74` distribuído no pacote **`{HEgis}`**.
+ao pacote HEgis é omitida aqui, pois já foi descrita na vinheta de **[Pré-processamento dos dados de bandas de elevação](pp-elevbands.html)**. O produto pré-processado nesta etapa é o `poly_posto` que corresponde aos dados `poly74` distribuído no pacote **`{HEgis}`**.
 
 ```{r poly-posto}
 (poly_posto <- poly74)
@@ -246,11 +246,8 @@ meteo_data
 
 # Criação do NetCDF das forçantes meteorológicas
 
- temos os principais dados de entrada da função `elev_bands_nc()`. Então podemos gerar o arquivo NetCDF das forçantes meteorológicas 
-para o posto 74, usando 14 bandas de elevação usando o código:
+Os dados `meteo_data` são usados como entrada função `meteo_forcing_nc()`. Então podemos gerar o arquivo NetCDF das forçantes meteorológicas para o posto 74, passando cada coluna daqueles dados, além das coordenadas do centróide da BH:
 
-
-Para detalhes sobre a função `elev_bands_nc()` consulte o help (`?elev_bands_nc`).
 
 ```{r}
 # arquivo de saída
