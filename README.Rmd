@@ -98,7 +98,7 @@ if (requireNamespace("tidync", quietly = TRUE)) {
   out <- tidync(elev_bands_file) %>% 
     hyper_tibble()
   # compara arquivo de exemplo do FUSE
-  ref <- tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_elev_bands.nc") %>% hyper_tibble()
+  ref <- tidync::tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_elev_bands.nc") %>% tidync::hyper_tibble()
 }
 
 out
