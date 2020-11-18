@@ -92,10 +92,10 @@ knitr::include_graphics("mermaid-diagram-20201019171247.svg")
 ## Pacotes 
 
 ```{r pcks, message=FALSE, warning=FALSE}
+library(raster)
 library(HEgis)
 library(lhmetools)
 library(fuse.prep)
-library(raster)
 library(dplyr)
 ```
 
@@ -116,6 +116,13 @@ A segunda base de dados é distribuída em [arquivos NetCDF](https://utexas.app.
 
 ```{r, eval = FALSE}
 (nc_files <- meteo_nc(c("prec", "et0"), dest_dir = "input"))
+```
+
+```
+prec 
+"input/brick-prec-25km-19800101-20151231.nc" 
+                                                                              et0 
+ "input//brick-ETo-25km-19800101-20170731.nc" 
 ```
 
 
@@ -166,11 +173,14 @@ poly_posto <- parte_nome %>%
 (ccoords <- centroids(poly_station = poly_posto))
 ```
 
+
+
 ## Elevação do terreno da BH (`con_dem`)
 
 O raster de entrada da função `elev_bands_nc(con_dem, ...)` é o obtido no código abaixo seguindo o fluxograma desta etapa (primeira coluna da Figura \@ref(fig:fluxograma)).
 
 ```{r path_hs, eval = FALSE}
+# local onde foi salvo o 
 path_hs <- "input/sa_con_3s_hydrosheds.grd"
 ```
 
@@ -179,10 +189,20 @@ path_hs <- "~/Dropbox/datasets/GIS/hydrosheds/sa_con_3s_hydrosheds.grd"
 ```
 
 
-```{r con_dem-flux}
+```{r con_dem-flux, eval = FALSE}
 con_hs <- raster(path_hs)
 con_dem <- extract_condem(condem = con_hs, poly_station = poly_posto)
 con_dem
+```
+```
+class      : RasterLayer 
+dimensions : 1957, 3329, 6514853  (nrow, ncol, ncell)
+resolution : 0.0008333333, 0.0008333333  (x, y)
+extent     : -51.7225, -48.94833, -26.855, -25.22417  (xmin, xmax, ymin, ymax)
+crs        : +proj=longlat +datum=WGS84 +no_defs 
+source     : memory
+names      : layer 
+values     : 588, 1506  (min, max)
 ```
 
 
@@ -190,7 +210,7 @@ con_dem
 
 O raster de entrada da função `elev_bands_nc(..., meteo_raster)` é o obtido no código abaixo seguindo o fluxograma desta etapa (última coluna da Figura \@ref(fig:fluxograma)).
 
-```{r meteo_raster-flux}
+```{r meteo_raster-flux, eval = FALSE}
 # lê arquivo de prec diária ou faz download se ele não estiver no dest_dir
 prec_brick <- import_nc(
   varnc = "prec",
@@ -203,6 +223,16 @@ meteo_raster <- annual_climatology(
   cutoff = 0
 )
 meteo_raster
+```
+```
+class      : RasterLayer 
+dimensions : 6, 11, 66  (nrow, ncol, ncell)
+resolution : 0.25, 0.25  (x, y)
+extent     : -51.75, -49, -26.75, -25.25  (xmin, xmax, ymin, ymax)
+crs        : +proj=longlat +datum=WGS84 +no_defs 
+source     : memory
+names      : layer 
+values     : 1449.61, 2070.507  (min, max)
 ```
 
 # Criação do NetCDF de bandas de elevação
@@ -219,7 +249,7 @@ dest_eb_file <- "output/posto74_elevation_bands.nc"
 dest_eb_file <- file.path(tmpDir(), "posto74_elevation_bands.nc")
 ```
 
-```{r}
+```{r, eval = FALSE}
 elev_bands_file <- elev_bands_nc(
   con_dem,
   meteo_raster,
@@ -236,6 +266,8 @@ elev_bands_file <- elev_bands_nc(
 ```{r, eval = FALSE}
 elev_bands_file
 ```
+
+
 
 ```{r, echo = FALSE}
 (dest_eb_file <- "output/posto74_elevation_bands.nc")
