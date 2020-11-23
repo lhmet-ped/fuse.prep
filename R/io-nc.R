@@ -67,6 +67,7 @@ save_data <- function(data_posto,# = qnat_posto,
 
 .down_nc <- function(varnc = c("prec", "et0"), dest_dir = "input") {
 
+  # varnc = "
   checkmate::assert_path_for_output(dest_dir, overwrite = TRUE)
 
   # dropbox links
@@ -121,7 +122,7 @@ meteo_nc <- function(varnc, dest_dir  = "input") {
     return(path_nc)
   }
 
-  path_nc <- .down_nc(dest_dir, varnc)
+  path_nc <- .down_nc(varnc, dest_dir)
   path_nc
 }
 
