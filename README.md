@@ -36,7 +36,7 @@ instalar:
     [aqui](https://github.com/r-spatial/sf/blob/master/README.md#linux)).
 
 No Windows você precisa do [7-zip](https://www.7-zip.org/), um software
-livre facilmente instalado a partir do R com o pacote **{`installr`}**
+livre, facilmente instalado a partir do R com o pacote **{`installr`}**
 usando `installr::install.7zip()`.
 
 ## Instalação
@@ -134,7 +134,7 @@ elev_bands_file <- elev_bands_nc(
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_bands_file
-#> [1] "/tmp/RtmpMa1dVB/posto74_elevation_bands.nc"
+#> [1] "/tmp/RtmpCxRGhZ/posto74_elevation_bands.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```
