@@ -22,6 +22,23 @@ para o FUSE:
     potencial (mm dia<sup>-1</sup>) e opcionalmente de vazão observada
     (ou deflúvio, mm dia<sup>-1</sup>);
 
+## Pré-requisitos do sistema
+
+Como o **{`fuse.prep`}** depende dos pacotes **{`lhmetools`}**,
+**{`HEgis`}** e **{`HEobs`}**. Para sistemas Unix, você precisa
+instalar:
+
+  - netcdf (\>= 4.7.3) e udunits-2 (instruções de instalação
+    [aqui](https://github.com/ropensci/tidync#ubuntudebian))
+
+  - GDAL (\>= 2.0.1), GEOS (\>= 3.4.0) and Proj.4 (\>= 4.8.0)
+    (instruções de instalação
+    [aqui](https://github.com/r-spatial/sf/blob/master/README.md#linux)).
+
+No Windows você precisa do [7-zip](https://www.7-zip.org/), um software
+livre facilmente instalado a partir do R com o pacote **{`installr`}**
+usando `installr::install.7zip()`.
+
 ## Instalação
 
 O **{`fuse.prep`}** pode ser instalado do [GitHub](https://github.com/)
@@ -113,11 +130,11 @@ elev_bands_file <- elev_bands_nc(
   file_nc = elevbands_nc,
   na = -9999
 )
-#>   |                                                                              |                                                                      |   0%  |                                                                              |========                                                              |  11%  |                                                                              |================                                                      |  22%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================                                       |  44%  |                                                                              |=======================================                               |  56%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================                |  78%  |                                                                              |==============================================================        |  89%  |                                                                              |======================================================================| 100%
+#>   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================================                  |  75%  |                                                                              |======================================================================| 100%
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_bands_file
-#> [1] "/tmp/Rtmpb5Fbaa/posto74_elevation_bands.nc"
+#> [1] "/tmp/RtmpMa1dVB/posto74_elevation_bands.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```
@@ -129,21 +146,14 @@ hidrometeorológicas médias na área da BH, utilizaremos o conjunto de
 dados `forcdata74` disponibilizado com este pacote.
 
 ``` r
-forcdata74
-#> # A tibble: 13,149 x 5
-#>    date          id      pr   pet q_obs
-#>    <date>     <dbl>   <dbl> <dbl> <dbl>
-#>  1 1980-01-01    74  0.363   5.37  1.81
-#>  2 1980-01-02    74  0.214   5.01  1.64
-#>  3 1980-01-03    74  0.169   5.38  1.43
-#>  4 1980-01-04    74  0.226   5.53  1.34
-#>  5 1980-01-05    74  0.0616  5.51  1.22
-#>  6 1980-01-06    74  1.36    4.67  1.17
-#>  7 1980-01-07    74 28.1     3.55  1.27
-#>  8 1980-01-08    74  6.70    3.57  1.44
-#>  9 1980-01-09    74 12.4     3.40  1.43
-#> 10 1980-01-10    74 12.2     4.99  1.38
-#> # … with 13,139 more rows
+str(forcdata74)
+#> tibble [13,149 × 6] (S3: tbl_df/tbl/data.frame)
+#>  $ date : Date[1:13149], format: "1980-01-01" "1980-01-02" ...
+#>  $ id   : num [1:13149] 74 74 74 74 74 74 74 74 74 74 ...
+#>  $ pr   : num [1:13149] 0.3635 0.2136 0.169 0.226 0.0616 ...
+#>  $ temp : num [1:13149] 20.6 20.6 20.6 20.6 20.6 ...
+#>  $ pet  : num [1:13149] 5.37 5.01 5.38 5.53 5.51 ...
+#>  $ q_obs: num [1:13149] 1.81 1.64 1.43 1.34 1.22 ...
 ```
 
 Para saber como gerar estes dados consulte a vinheta de
@@ -162,6 +172,7 @@ forcings_nc <- "inst/extdata/posto74_input.nc"
 # exporta dados para netcdf
 meteo_forcing_nc(
   pr = forcdata74[["pr"]],
+  temp = forcdata74[["temp"]],
   pet = forcdata74[["pet"]],
   q_obs = forcdata74[["q_obs"]],
   dates = forcdata74[["date"]],

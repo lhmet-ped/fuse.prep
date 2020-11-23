@@ -29,6 +29,18 @@ de entrada para o FUSE:
 - forçantes meteorológicas: armazena as séries temporais da média diárias na área da bacia hidrográfica das variáveis: temperatura do ar (°C), precipitação (mm dia^-1^), evapotranspiração potencial (mm dia^-1^) e opcionalmente de vazão observada (ou deflúvio, mm dia^-1^);
 
 
+
+
+## Pré-requisitos do sistema
+
+Como o **{`fuse.prep`}** depende dos pacotes **{`lhmetools`}**, **{`HEgis`}** e **{`HEobs`}**. Para sistemas Unix, você precisa instalar: 
+
+- netcdf (>= 4.7.3) e udunits-2 (instruções de instalação [aqui](https://github.com/ropensci/tidync#ubuntudebian))
+
+- GDAL (>= 2.0.1), GEOS (>= 3.4.0) and Proj.4 (>= 4.8.0) (instruções de instalação [aqui](https://github.com/r-spatial/sf/blob/master/README.md#linux)). 
+
+No Windows você precisa do [7-zip](https://www.7-zip.org/), um software livre facilmente instalado a partir do R com o pacote **{`installr`}** usando `installr::install.7zip()`.
+
 ## Instalação
 
 O **{`fuse.prep`}** pode ser instalado do [GitHub](https://github.com/) com:
@@ -116,7 +128,7 @@ names(ref)
 Para gerar o arquivo NetCDF com as séries temporais das forçantes hidrometeorológicas médias na área da BH, utilizaremos o conjunto de dados `forcdata74` disponibilizado com este pacote. 
 
 ```{r}
-forcdata74
+str(forcdata74)
 ```
 
 Para saber como gerar estes dados consulte a vinheta de *Pré-processamento dos dados das forçantes meteorológicas* digitando `vignette('pp-forcmets', package = "fuse.prep")`.
@@ -129,6 +141,7 @@ forcings_nc <- "inst/extdata/posto74_input.nc"
 # exporta dados para netcdf
 meteo_forcing_nc(
   pr = forcdata74[["pr"]],
+  temp = forcdata74[["temp"]],
   pet = forcdata74[["pet"]],
   q_obs = forcdata74[["q_obs"]],
   dates = forcdata74[["date"]],
