@@ -121,7 +121,7 @@ meteo_nc <- function(varnc, dest_dir  = "input") {
     path_nc <- local_paths[varnc]
     return(path_nc)
   }
-
+  # order matters
   path_nc <- .down_nc(varnc, dest_dir)
   path_nc
 }
