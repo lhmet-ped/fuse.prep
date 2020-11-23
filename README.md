@@ -22,6 +22,17 @@ para o FUSE:
     potencial (mm dia<sup>-1</sup>) e opcionalmente de vazão observada
     (ou deflúvio, mm dia<sup>-1</sup>);
 
+A seguir apresenta-se como gerar estes dois arquivos a partir de dados
+pré-processados fornecidos com os pacotes. Após conhecer estas funções,
+você pode estar interessado em gerar os dados para sua bacia
+hidrográfica de interesse. Este procedimento é detalhado nas vinhetas
+fornecidas com o **`{fuse.prep}`**. Recomenda-se reproduzi-las na
+seguinte ordem:
+
+1.  `vignette('pp-elevbands', package = "fuse.prep")`
+
+2.  `vignette('pp-forcmets', package = "fuse.prep")`
+
 ## Pré-requisitos do sistema
 
 Como o **{`fuse.prep`}** depende dos pacotes **{`lhmetools`}**,
@@ -134,7 +145,7 @@ elev_bands_file <- elev_bands_nc(
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_bands_file
-#> [1] "/tmp/RtmpCxRGhZ/posto74_elevation_bands.nc"
+#> [1] "/tmp/RtmpHhQj0E/posto74_elevation_bands.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```

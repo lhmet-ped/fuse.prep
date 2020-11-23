@@ -28,7 +28,11 @@ de entrada para o FUSE:
 
 - forçantes meteorológicas: armazena as séries temporais da média diárias na área da bacia hidrográfica das variáveis: temperatura do ar (°C), precipitação (mm dia^-1^), evapotranspiração potencial (mm dia^-1^) e opcionalmente de vazão observada (ou deflúvio, mm dia^-1^);
 
+A seguir apresenta-se como gerar estes dois arquivos a partir de dados pré-processados fornecidos com os pacotes. Após conhecer estas funções, você pode estar interessado em gerar os dados para sua bacia hidrográfica de interesse. Este procedimento é detalhado nas vinhetas fornecidas com o **`{fuse.prep}`**. Recomenda-se reproduzi-las na seguinte ordem:
 
+1. `vignette('pp-elevbands', package = "fuse.prep")`
+
+2. `vignette('pp-forcmets', package = "fuse.prep")`
 
 
 ## Pré-requisitos do sistema
@@ -52,7 +56,7 @@ devtools::install_github("lhmet-ped/fuse.prep", build_vignettes = TRUE)
 
 A opção `build_vignettes = TRUE` instalará o pacote incluindo as vinhetas do pacote
 que apresentam as etapas de pré-processamento dos dados necessários para criação
-dos arquivos NetCDF.
+dos arquivos NetCDF. 
 
 ### NetCDF de bandas de elevação 
 
