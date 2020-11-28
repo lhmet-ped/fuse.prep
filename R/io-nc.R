@@ -162,30 +162,3 @@ import_nc <- function(varnc = c("prec", "et0"), dest_dir = "input"){
   )
   b
 }
-
-
-#------------------------------------------------------------------------------
-# write_nc
-f <- function(info_posto,
-              nc_name = "elev_bands.nc",
-              nb = 5,
-              xy, # = coords_posto,
-              long_name = "A long name"
-) {
-  x <- ncdf4::ncdim_def(
-    name = 'latitude',
-    units = 'degreesN',
-    vals = xy[["longitude"]]
-  )
-  y <- ncdf4::ncdim_def(
-    name = 'longitude',
-    units = 'degreesE',
-    vals = xy[["longitude"]]
-  )
-
-  z_bands <- ncdf4::ncdim_def(
-    name = 'elevation_band',
-    units = '-',
-    vals = as.numeric(1 : nb)
-  )
-}
