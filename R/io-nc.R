@@ -90,7 +90,10 @@ save_data <- function(data_posto,# = qnat_posto,
     utils::download.file(lnk_nc[i],
                          destfile = dest_file[i],
                          mode = "wb",
-                         method = "wget"
+                         method = ifelse(checkmate::test_os("linux"),
+                                         "wget",
+                                         getOption("download.file.method")
+                                         )
                         )
   }
 
