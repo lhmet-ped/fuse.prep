@@ -66,7 +66,9 @@ save_data <- function(data_posto,# = qnat_posto,
   unlist(stringr::str_split(basename(.find_nc(FALSE)[varnc]), "\\?"))[c(TRUE, FALSE)]
 }
 
-.down_nc <- function(varnc = c("prec", "et0"), dest_dir = "input") {
+.down_nc <- function(varnc = c("prec", "et0"),
+                     dest_dir = "input"
+                     ) {
 
   # varnc = "
   checkmate::assert_path_for_output(dest_dir, overwrite = TRUE)
@@ -78,12 +80,18 @@ save_data <- function(data_posto,# = qnat_posto,
   # output nc
   nc_fname <- unlist(stringr::str_split(basename(lnk_nc), "\\?"))[c(TRUE, FALSE)]
   dest_file <- file.path(dest_dir, nc_fname)
+  fs::file_create(dest_file)
+
 
   # downloading
   for(i in seq_along(dest_file)){
     # i = 1
     message("\ndownlonding file: ", basename(nc_fname[i]), "\n")
-    utils::download.file(lnk_nc[i], destfile = dest_file[i], mode = "wb")
+    utils::download.file(lnk_nc[i],
+                         destfile = dest_file[i],
+                         mode = "wb",
+                         method = "wget"
+                        )
   }
 
   checkmate::assert_file_exists(dest_file)
@@ -112,7 +120,7 @@ meteo_nc <- function(varnc, dest_dir  = "input") {
   # check data download before in the input directory
   nc_previous <- file.path(dest_dir, .nc_name(varnc))
   if(all(file.exists(nc_previous))){
-    message("Loading previously downloaded data available in the 'input' directory.")
+    message("File names from previously downloaded data available in the 'input' directory.")
     return(nc_previous)
   }
 
