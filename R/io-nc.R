@@ -37,7 +37,8 @@ save_data <- function(data_posto,# = qnat_posto,
   if(!local){
     lnks <- c(
       prec = "https://www.dropbox.com/s/hj6bu183myfor9y/brick-prec-25km-19800101-20151231.nc?dl=1",
-      et0  = "https://www.dropbox.com/s/jfsehx65g0z8yjo/brick-ETo-25km-19800101-20171231.nc?dl=1"
+      #et0  = "https://www.dropbox.com/s/jfsehx65g0z8yjo/brick-ETo-25km-19800101-20171231.nc?dl=1"
+      et0  = "https://www.dropbox.com/s/jfsehx65g0z8yjo/brick-ETo-25km-19800101-20170731.nc?dl=1"
     )
     return(lnks)
   }
