@@ -158,7 +158,7 @@ annual_climatology <- function(meteo_brick = import_nc(varnc = "prec", dest_dir 
   # meteo_brick = b_prec; poly_station = poly74; ref_crs = "+proj=longlat +datum=WGS84"
 
   # alt leas one year
-  yrs <- lubridate::year(getZ(meteo_brick))
+  yrs <- lubridate::year(raster::getZ(meteo_brick))
   day_per_yrs <- ifelse(lubridate::leap_year(unique(yrs)), 366, 365)
   nyears <- sum(table(yrs)/day_per_yrs == 1)
   checkmate::assert_true(nyears >= 1)
