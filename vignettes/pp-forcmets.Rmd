@@ -34,7 +34,7 @@ na Figura \@ref(fig:fluxograma-fm).
 ## site referência 
 # https://mermaid-js.github.io/mermaid/diagrams-and-syntax-and-examples/flowchart.html
 ## OBS: é possível utilizar mermaid direto no R com o pacote DiagrammeR, mas
-## há somente alguns 
+## há somente alguns recursos de design.
 #univar_flowchart = "
 graph TD
    DCB[(Dados Meteorológicos BR)] --> |brick-prec-25km-19800101-20151231.nc| INC[import_nc]
