@@ -5,13 +5,17 @@
 
 <!-- badges: start -->
 
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Codecov test
+coverage](https://codecov.io/gh/lhmet-ped/fuse.prep/branch/master/graph/badge.svg)](https://codecov.io/gh/lhmet-ped/fuse.prep?branch=master)
 <!-- badges: end -->
 
 O pacote **`{fuse.prep}`** tem o objetivo de gerar os dados de entrada
 para aplicação do *Framework for Understanding Structural Errors*
-([FUSE](https://naddor.github.io/fuse/)) na escala de bacia hidrográfica
-(*catchment scale*). São necessários dois arquivos NetCDF de entrada
-para o FUSE:
+([FUSE](https://naddor.github.io/fuse/)) nomodo de escala de bacia
+hidrográfica. São necessários dois arquivos NetCDF de entrada para o
+FUSE:
 
   - bandas de elevação do terreno: armazena as frações de área da bacia
     hidrográfica e da precipitação anual por banda de elevação;
@@ -36,8 +40,11 @@ seguinte ordem:
 ## Pré-requisitos do sistema
 
 Como o **{`fuse.prep`}** depende dos pacotes **{`lhmetools`}**,
-**{`HEgis`}** e **{`HEobs`}**. Para sistemas Unix, você precisa
+**{`HEgis`}** e **{`HEobs`}**. Para sistemas linux, você precisa
 instalar:
+
+  - unrar (\>= 5.61, instruções de instalação
+    [aqui](https://github.com/lhmet/lhmetools/#system-requirements))
 
   - netcdf (\>= 4.7.3) e udunits-2 (instruções de instalação
     [aqui](https://github.com/ropensci/tidync#ubuntudebian))
@@ -145,7 +152,7 @@ elev_bands_file <- elev_bands_nc(
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_bands_file
-#> [1] "/tmp/RtmpHhQj0E/posto74_elevation_bands.nc"
+#> [1] "/tmp/RtmpyHMTzL/posto74_elevation_bands.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```
