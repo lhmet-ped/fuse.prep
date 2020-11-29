@@ -1,13 +1,13 @@
 Package: fuse.prep
 Title: Preparation Of Input Data For Fuse
-Version: 0.0.4.91
+Version: 0.1.5
 Authors@R: 
     person(given = "Jônatan",
            family = "Tatsch",
            role = c("aut", "cre"),
            email = "lhmet@ufsm.br")
 Description: Data tidyng of forcing time series and elevation
-    bands for FUSE.
+    bands for FUSE application at catchment mode.
 License: MIT + file LICENSE
 URL: https://github.com/lhmet-ped/fuse.prep
 BugReports: https://github.com/lhmet-ped/fuse.prep/issues
@@ -39,7 +39,8 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    bookdown
+    bookdown,
+    covr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

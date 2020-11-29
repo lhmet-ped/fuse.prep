@@ -6,9 +6,13 @@ interesse, ao invés de receber vetores de cada variável.
 
 - [ ] incluir testes para `spatial_average`, `annual_climatology`, `annual_summary`
 
+# fuse.prep 0.1.5
+
+- [x] resolvida issue #4  (graças à @nelsonvnperu e @andreza-santos). 
+
 # fuse.prep 0.0.4.91
 
-- [x] incluir vinheta do pré-processamento de dados das forçantes meteorológicas
+- [x] incluir vinhetas de pré-processamento de dados das forçantes meteorológicas
 
 
 # fuse.prep 0.0.4
