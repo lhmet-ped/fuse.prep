@@ -56,7 +56,11 @@ comb_data <- function(prec, et0, qobs, area,
 #' @family forcings functions
 .check_inputs_meteo_forc <- function(variab_list, ctrd, file) {
   # variab_list = forcdata74
-  met_vnames <- names(dplyr::select(variab_list, -date, -id))
+  meteo_data <- dplyr::select(variab_list, -date, -id)
+  met_vnames <- names(meteo_data)
+  all_obs_miss <- apply(meteo_data, 2, function(x) all(is.na(x)))
+  checkmate::assert_true(sum(all_obs_miss) == 0)
+
   checkmate::assert_subset(met_vnames, all_variables())
   checkmate::assert_choice("date", names(variab_list))
   #identical_lengths <- all(diff(unname(unlist(lapply(variab_list, length)))) == 0)
