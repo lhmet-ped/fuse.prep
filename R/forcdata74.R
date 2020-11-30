@@ -13,7 +13,7 @@
 #' }
 #' @note Since FUSE require temperature only for the snow model, the daily
 #' temperature refers to monthly climatological averages.
-#' @source \url{https://www.worldclim.org/data/worldclim21.html}
+#' @source temperature data from \url{https://www.worldclim.org/data/worldclim21.html}
 #'
 #' @references https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.4518
 "forcdata74"
