@@ -6,8 +6,8 @@
 #' \describe{
 #' \item{date}{date object, start 1980-01-01, end 2015-12-31}
 #' \item{id}{numeric vector, id of ONS station}
-#' \item{pr}{numeric vector, precipitation in mm/day}
 #' \item{temp}{numeric vector, monthly average temperature in °C}
+#' \item{pr}{numeric vector, precipitation in mm/day}
 #' \item{pet}{numeric vector, potential ET in mm/day}
 #' \item{q_obs}{optional, numeric vector, river discharge in mm/day}
 #' }
