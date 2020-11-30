@@ -144,7 +144,6 @@ glob_atts_tbl <- function(nc_obj, id) {
 #' Create NetCDF file of Meteorological forcings
 #'
 #' @param forc_tbl tibble with time series of meteorological forcings.
-#' @param dates objects of class "Date" representing calendar dates.
 #' @inheritParams elev_bands_nc
 #' @export
 #' @examples
@@ -153,11 +152,7 @@ glob_atts_tbl <- function(nc_obj, id) {
 #'  forcings_nc <- "inst/extdata/posto74_input.nc"
 #'  # exporta dados para netcdf
 #'  meteo_forcing_nc(
-#'    temp = forcdata74[["temp"]],
-#'    pr = forcdata74[["pr"]],
-#'    pet = forcdata74[["pet"]],
-#'    q_obs = forcdata74[["q_obs"]],
-#'    dates = forcdata74[["date"]],
+#'    forc_tbl = forcdata74,
 #'    ccoords = centroids(poly_station = poly74),
 #'    file_nc = forcings_nc
 #'  )
