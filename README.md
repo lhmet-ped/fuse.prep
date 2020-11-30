@@ -152,7 +152,7 @@ elev_bands_file <- elev_bands_nc(
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_bands_file
-#> [1] "/tmp/RtmpyHMTzL/posto74_elevation_bands.nc"
+#> [1] "/tmp/RtmpiD8xJ7/posto74_elevation_bands.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```
@@ -189,8 +189,8 @@ bacia hidrográfica do posto e o arquivo NetCDF que será salvo.
 forcings_nc <- "inst/extdata/posto74_input.nc"
 # exporta dados para netcdf
 meteo_forcing_nc(
-  pr = forcdata74[["pr"]],
   temp = forcdata74[["temp"]],
+  pr = forcdata74[["pr"]],
   pet = forcdata74[["pet"]],
   q_obs = forcdata74[["q_obs"]],
   dates = forcdata74[["date"]],
