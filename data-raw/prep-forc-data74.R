@@ -43,7 +43,7 @@ clim_temp <- tibble(
 forcdata74 <-
 mutate(forcdata74, month = lubridate::month(date)) %>%
   full_join(clim_temp) %>%
-  dplyr::select(date:id, pr, temp, everything(), -month)
+  dplyr::select(date:id, temp, pr, everything(), -month)
 
 forcdata74
 
