@@ -54,14 +54,16 @@ comb_data <- function(prec, et0, qobs, area,
 #' Check inputs
 #' @noRd
 #' @family forcings functions
-.check_inputs_meteo_forc <- function(variab_list, ctrd, dts, file) {
-  vnames <- names(variab_list)
-  checkmate::assert_subset(vnames, all_variables())
-  identical_lengths <- all(diff(unname(unlist(lapply(variab_list, length)))) == 0)
-  checkmate::assert_true(identical_lengths)
-  checkmate::assert_subset(class(dts), c("Date", "POSIXct", "POSIXt"))
-  checkmate::assert_subset(c("lon", "lat", "id"), names(ctrd))
+.check_inputs_meteo_forc <- function(variab_list, ctrd, file) {
+  # variab_list = forcdata74
+  met_vnames <- names(dplyr::select(variab_list, -date, -id))
+  checkmate::assert_subset(met_vnames, all_variables())
+  checkmate::assert_choice("date", names(variab_list))
+  #identical_lengths <- all(diff(unname(unlist(lapply(variab_list, length)))) == 0)
+  #checkmate::assert_true(identical_lengths)
+  checkmate::assert_subset(class(variab_list$date), c("Date", "POSIXct", "POSIXt"))
   checkmate::assert_class(ctrd, "data.frame")
+  checkmate::assert_subset(c("lon", "lat", "id"), names(ctrd))
   checkmate::assert_directory_exists(dirname(file))
   return(invisible(NULL))
 }
@@ -110,7 +112,7 @@ vars_atts_tbl <- function(vnames, dim_atts_list, na_value) {
   tibble::tibble(
     name = vnames,
     units = var_units[names(var_units) %in% vnames],
-    dim = lapply(1:length(name), function(i) dim_atts_list),
+    dim = lapply(seq_along(name), function(i) dim_atts_list),
     missval = rep(na_value, length(name)),
     longname = long_names[names(long_names) %in% vnames]
   )
@@ -137,7 +139,7 @@ glob_atts_tbl <- function(nc_obj, id) {
 
 #' Create NetCDF file of Meteorological forcings
 #'
-#' @param ... numeric vectors with data of variables (e.g, `prec = dataset[['prec']], temp = dataset[['temp']]`, etc)
+#' @param forc_tbl tibble with time series of meteorological forcings.
 #' @param dates objects of class "Date" representing calendar dates.
 #' @inheritParams elev_bands_nc
 #' @export
@@ -147,6 +149,7 @@ glob_atts_tbl <- function(nc_obj, id) {
 #'  forcings_nc <- "inst/extdata/posto74_input.nc"
 #'  # exporta dados para netcdf
 #'  meteo_forcing_nc(
+#'    temp = forcdata74[["temp"]],
 #'    pr = forcdata74[["pr"]],
 #'    pet = forcdata74[["pet"]],
 #'    q_obs = forcdata74[["q_obs"]],
@@ -157,23 +160,25 @@ glob_atts_tbl <- function(nc_obj, id) {
 #'  file.exists(forcings_nc)
 #'}
 #' @family forcings functions
-meteo_forcing_nc <- function(...,
-                             dates,
+meteo_forcing_nc <- function(forc_tbl,
                              ccoords,
                              file_nc = "inst/extdata/74_input.nc",
                              na = -9999,
                              force_v4 = TRUE) {
-  data_list <- list(...)
-  # data_list = list(pr= forcdata74$pr, pet = forcdata74$pet); dates = forcdata74$date; ccoords = centroids(poly_station = poly74); na = -9999; file_nc = "inst/extdata/74_input.nc"; force_v4 = TRUE
-  var_names <- names(data_list)
+  # data_list <- forc_tbl
+  # data_list = list(pr= forcdata74$pr, pet = forcdata74$pet);
+  # ccoords = centroids(poly_station = poly74); na = -9999; file_nc = "inst/extdata/74_input.nc"; force_v4 = TRUE
+  # forc_tbl = forcdata74
+  var_names <- all_variables()[all_variables() %in% names(forc_tbl)]
 
   # check inputs
   .check_inputs_meteo_forc(
-    variab_list = data_list,
-    dts = dates,
+    variab_list = forc_tbl,
     ctrd = ccoords,
     file = file_nc
   )
+
+  dates <- forc_tbl$date
 
   # define dimensions
   dim_atts_l <- dim_atts_tbl(ccoords, dates) %>%
@@ -187,23 +192,26 @@ meteo_forcing_nc <- function(...,
   nc_conn <- ncdf4::nc_create(
     filename = file_nc,
     vars = vars_atts_l,
-    force_v4
+    force_v4 #,verbose = TRUE
   )
 
   # write global atttributes
-  glob_atts_l <-  glob_atts_tbl(list(nc_conn), ccoords[["id"]]) %>%
+  glob_atts_l <- glob_atts_tbl(list(nc_conn), ccoords[["id"]]) %>%
     purrr::pmap(., ncdf4::ncatt_put)
 
   # write variables to file
-  lapply(
-    var_names,
-    function(ivar) {
-      ncdf4::ncvar_put(
-        nc = nc_conn,
-        varid = .select_attr_var(vars_atts_l, ivar),
-        vals = data_list[[ivar]]
-      )
-    }
+  invisible(
+    lapply(
+      var_names,
+      function(ivar) {
+        # ivar = "temp"
+        ncdf4::ncvar_put(
+          nc = nc_conn,
+          varid = .select_attr_var(vars_atts_l, ivar),
+          vals = forc_tbl[[ivar]]
+        )
+      }
+    )
   )
 
   ncdf4::nc_close(nc_conn)
@@ -212,4 +220,4 @@ meteo_forcing_nc <- function(...,
 }
 
 # !TESTAR
-# meteo_forcing_nc()
+# meteo_forcing_nc(forcdata74,  ccoords = centroids(poly_station = poly74))
