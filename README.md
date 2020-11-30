@@ -152,7 +152,7 @@ elev_bands_file <- elev_bands_nc(
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_bands_file
-#> [1] "/tmp/RtmpiD8xJ7/posto74_elevation_bands.nc"
+#> [1] "/tmp/RtmpFvMWNx/posto74_elevation_bands.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```
@@ -168,8 +168,8 @@ str(forcdata74)
 #> tibble [13,149 × 6] (S3: tbl_df/tbl/data.frame)
 #>  $ date : Date[1:13149], format: "1980-01-01" "1980-01-02" ...
 #>  $ id   : num [1:13149] 74 74 74 74 74 74 74 74 74 74 ...
-#>  $ pr   : num [1:13149] 0.3635 0.2136 0.169 0.226 0.0616 ...
 #>  $ temp : num [1:13149] 20.6 20.6 20.6 20.6 20.6 ...
+#>  $ pr   : num [1:13149] 0.3635 0.2136 0.169 0.226 0.0616 ...
 #>  $ pet  : num [1:13149] 5.37 5.01 5.38 5.53 5.51 ...
 #>  $ q_obs: num [1:13149] 1.81 1.64 1.43 1.34 1.22 ...
 ```
@@ -189,11 +189,7 @@ bacia hidrográfica do posto e o arquivo NetCDF que será salvo.
 forcings_nc <- "inst/extdata/posto74_input.nc"
 # exporta dados para netcdf
 meteo_forcing_nc(
-  temp = forcdata74[["temp"]],
-  pr = forcdata74[["pr"]],
-  pet = forcdata74[["pet"]],
-  q_obs = forcdata74[["q_obs"]],
-  dates = forcdata74[["date"]],
+  forc_tbl = forcdata74,
   ccoords = centroids(poly_station = poly74),
   file_nc = forcings_nc 
 )

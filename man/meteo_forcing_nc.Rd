@@ -27,8 +27,6 @@ and \code{lat}.}
  cannot be read by version 3 of the netcdf library).  If FALSE, then the file is created
  in netcdf version 3 format UNLESS the user has requested features that require version 4.
  Deafult is FALSE.}
-
-\item{dates}{objects of class "Date" representing calendar dates.}
 }
 \description{
 Create NetCDF file of Meteorological forcings
@@ -39,11 +37,7 @@ if(FALSE){
  forcings_nc <- "inst/extdata/posto74_input.nc"
  # exporta dados para netcdf
  meteo_forcing_nc(
-   temp = forcdata74[["temp"]],
-   pr = forcdata74[["pr"]],
-   pet = forcdata74[["pet"]],
-   q_obs = forcdata74[["q_obs"]],
-   dates = forcdata74[["date"]],
+   forc_tbl = forcdata74,
    ccoords = centroids(poly_station = poly74),
    file_nc = forcings_nc
  )

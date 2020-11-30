@@ -334,10 +334,7 @@ Os dados `meteo_data` são usados como entrada função `meteo_forcing_nc()`. En
 forcings_nc <- path("output", "posto74_input.nc")
 # exporta dados para netcdf
 meteo_forcing_nc(
-  pr = meteo_data[["pr"]],
-  pet = meteo_data[["pet"]],
-  q_obs = meteo_data[["qnat"]],
-  dates = meteo_data[["date"]],
+  forc_tbl = meteo_data,
   ccoords = centroids(poly_station = poly_posto),
   file_nc = forcings_nc 
 )
