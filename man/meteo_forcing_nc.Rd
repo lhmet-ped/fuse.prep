@@ -5,8 +5,7 @@
 \title{Create NetCDF file of Meteorological forcings}
 \usage{
 meteo_forcing_nc(
-  ...,
-  dates,
+  forc_tbl,
   ccoords,
   file_nc = "inst/extdata/74_input.nc",
   na = -9999,
@@ -14,9 +13,7 @@ meteo_forcing_nc(
 )
 }
 \arguments{
-\item{...}{numeric vectors with data of variables (e.g, \verb{prec = dataset[['prec']], temp = dataset[['temp']]}, etc)}
-
-\item{dates}{objects of class "Date" representing calendar dates.}
+\item{forc_tbl}{tibble with time series of meteorological forcings.}
 
 \item{ccoords}{a \link[tibble:tibble-package]{tibble} with columns \code{lon}
 and \code{lat}.}
@@ -40,10 +37,7 @@ if(FALSE){
  forcings_nc <- "inst/extdata/posto74_input.nc"
  # exporta dados para netcdf
  meteo_forcing_nc(
-   pr = forcdata74[["pr"]],
-   pet = forcdata74[["pet"]],
-   q_obs = forcdata74[["q_obs"]],
-   dates = forcdata74[["date"]],
+   forc_tbl = forcdata74,
    ccoords = centroids(poly_station = poly74),
    file_nc = forcings_nc
  )

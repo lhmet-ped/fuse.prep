@@ -147,11 +147,7 @@ Cada variável é passada como um vetor conforme código abaixo. Os nomes dos ve
 forcings_nc <- "inst/extdata/posto74_input.nc"
 # exporta dados para netcdf
 meteo_forcing_nc(
-  pr = forcdata74[["pr"]],
-  temp = forcdata74[["temp"]],
-  pet = forcdata74[["pet"]],
-  q_obs = forcdata74[["q_obs"]],
-  dates = forcdata74[["date"]],
+  forc_tbl = forcdata74,
   ccoords = centroids(poly_station = poly74),
   file_nc = forcings_nc 
 )

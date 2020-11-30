@@ -32,6 +32,7 @@ strsplit(., "_") %>%
   lapply(., function(x) x[length(x)]) %>%
   unlist() %>%
   readr::parse_number() %>%
+  # pq precisamos de algum ano para usar datas
   paste0(mean(c(1970, 2000)), "-", ., "-", "01") %>%
   lubridate::ymd()
 
@@ -43,7 +44,8 @@ clim_temp <- tibble(
 forcdata74 <-
 mutate(forcdata74, month = lubridate::month(date)) %>%
   full_join(clim_temp) %>%
-  dplyr::select(date:id, pr, temp, everything(), -month)
+  # manter a ordem das vars como nos dados de exemplo do fuse
+  dplyr::select(date:id, temp, pr, everything(), -month)
 
 forcdata74
 

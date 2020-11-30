@@ -20,7 +20,8 @@ utils::globalVariables(
     "name",
     "posto",
     "pr",
-    "pet"
+    "pet",
+    "id"
   )
 )
 
