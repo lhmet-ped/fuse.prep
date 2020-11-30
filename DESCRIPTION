@@ -1,6 +1,6 @@
 Package: fuse.prep
 Title: Preparation Of Input Data For Fuse
-Version: 0.1.5.9000
+Version: 0.2.0
 Authors@R: 
     person(given = "Jônatan",
            family = "Tatsch",

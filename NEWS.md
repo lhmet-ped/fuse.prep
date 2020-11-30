@@ -1,12 +1,10 @@
-# fuse.prep (development version)
-
-
-# fuse.prep (development version)
-
-- [ ] `comb_data` deve receber a tabela de dados e selecionar as variáveis de
-interesse, ao invés de receber vetores de cada variável.
 
 - [ ] incluir testes para `spatial_average`, `annual_climatology`, `annual_summary`
+
+# fuse.prep 0.2.0
+
+- [x] `comb_data` recebe um tibble com as forçantes meteorológicas, ao invés
+de receber vetores de cada variável.
 
 # fuse.prep 0.1.5
 
