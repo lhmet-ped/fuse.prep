@@ -1,3 +1,7 @@
+# fuse.prep (development version)
+
+- [ ] incluir testes para `spatial_average`, `annual_climatology`, `annual_summary`
+
 # fuse.prep 0.2.0
 
 - [x] `comb_data` recebe um tibble com as forçantes meteorológicas, ao invés
