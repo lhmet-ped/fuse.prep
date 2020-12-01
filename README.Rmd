@@ -54,7 +54,11 @@ O **{`fuse.prep`}** pode ser instalado do [GitHub](https://github.com/) com:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("lhmet-ped/fuse.prep", build_vignettes = TRUE)
+devtools::install_github(
+  "lhmet-ped/fuse.prep",
+  build_vignettes = TRUE,
+  dependencies = TRUE
+)
 ```
 
 A opção `build_vignettes = TRUE` instalará o pacote incluindo as vinhetas do pacote
