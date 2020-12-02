@@ -287,9 +287,10 @@ tibble [13,727 × 3] (S3: tbl_df/tbl/data.frame)
  $ pet  : num [1:13727] 5.41 5.01 5.36 5.57 5.49 ...
 ``` 
 
-Os dados pré-processados (`prec_posto`, `pet_posto`, `qobs_posto`) são então combinados para serem usados na criação do NetCDF das forçantes meteorológicas.
+Os dados pré-processados (`prec_posto`, `pet_posto`, `qobs_posto`) são então combinados para serem usados na criação do NetCDF das forçantes meteorológicas. Esta tabela de dados salvaremos no diretório `output`, pois pode ser útil para análise diagnóstica do fechamento do balanço e cálculo de assinaturas hidrológicas.
 
 ```{r comb-data, eval = FALSE}
+if(!dir_exists("output")) dir_create("output")
 meteo_data <- comb_data(
   prec = prec_posto,
   et0 = pet_posto,
@@ -302,18 +303,6 @@ meteo_data <- comb_data(
 str(meteo_data)
 ```
 
-```{r comb-data-old, eval = FALSE, include = FALSE}
-meteo_data <- comb_data(
-  prec = prec_posto,
-  et0 = pet_posto,
-  qobs = qobs_posto,
-  area = area_posto,
-  save = TRUE,
-  prefix = "meteo-data-posto-",
-  dest_dir = system.file("extdata", package = "fuse.prep")
-)
-str(meteo_data)
-```
 ```
 tibble [13,149 × 6] (S3: tbl_df/tbl/data.frame)
  $ date   : Date[1:13149], format: "1980-01-01" ...
@@ -321,7 +310,7 @@ tibble [13,149 × 6] (S3: tbl_df/tbl/data.frame)
  $ pr     : num [1:13149] 0.3299 0.0578 0.1773 0.0476 0.0517 ...
  $ pet    : num [1:13149] 5.41 5.01 5.36 5.57 5.49 ...
  $ qnat   : num [1:13149] 631 573 500 467 425 ...
- $ qobs_mm: num [1:13149] 1.81 1.64 1.43 1.34 1.22 ...
+ $ q_obs  : num [1:13149] 1.81 1.64 1.43 1.34 1.22 ...
 ```
 
 
@@ -347,20 +336,4 @@ file.exists(forcings_nc)
 ```
 
 
-```{r write-forcs-old, eval = FALSE, include = FALSE}
-# arquivo de saída
-forcings_nc <- "extdata" %>%
-  system.file(package = "fuse.prep") %>%
-  path("posto74_input.nc")
-# exporta dados para netcdf
-meteo_forcing_nc(
-  pr = meteo_data[["pr"]],
-  pet = meteo_data[["pet"]],
-  q_obs = meteo_data[["qnat"]],
-  dates = meteo_data[["date"]],
-  ccoords = centroids(poly_station = poly_posto),
-  file_nc = forcings_nc 
-)
-file.exists(forcings_nc)
-```
 
