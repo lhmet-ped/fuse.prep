@@ -40,7 +40,7 @@ comb_data <- function(prec, et0, qobs, area,
   if(save){
     hydrodata_file <- save_data(hydrodata,
                                 .prefix = prefix,
-                                .posto_id = hydrodata$station[1],
+                                .posto_id = hydrodata$posto[1],
                                 .dest_dir = dest_dir
     )
     message(hydrodata_file)
