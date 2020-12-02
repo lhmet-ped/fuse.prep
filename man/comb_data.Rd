@@ -33,7 +33,8 @@ over.}
 saved.}
 }
 \value{
-a \code{\link[tibble]{tibble}}
+a \code{\link[tibble]{tibble}}, column q_obs is the \code{qnat} variable
+(input) expressed in mm (discharge).
 }
 \description{
 Join hydrometeorological data for FUSE and convert streamflow from cumecs

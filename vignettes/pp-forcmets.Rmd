@@ -154,7 +154,7 @@ Estas informações são usadas posteriormente como entrada das funções `extra
 
 ## Vazão observada (`qobs_posto`)
 
-Os dados de vazão observada para a BH de interesse são obtidos da base de dados de vazão natural da ONS. Podemos baixar estes dados usando o código abaixo que salvará a base de dados `input`.
+Os dados de vazão observada para a BH de interesse são obtidos da base de dados de vazão natural da ONS. Podemos baixar estes dados usando o código abaixo que salvará a base de dados no diretório `input`.
 <!-- Podemos baixar estes dados usando o código abaixo que salvará a base de dados no sub-diretório `inst/extdata` do diretório de instalação do pacote `HEobs` (obtido digitando no console do R `system.file(package = "HEobs")`).  -->
 
 ```{r set-down, eval = FALSE}
@@ -162,28 +162,6 @@ dropbox_link <- "https://www.dropbox.com/s/d40adhw66uwueet/VazoesNaturaisONS_D_8
 
 # diretório de destino dentro do sub-diretório 'extdata' do pacote HEobs
 dest_dir <- "input"
-dir_create(dest_dir)
-#dir_exists(dest_dir)
-
-# nome do arquivo
-dest_file <- dropbox_link %>% 
-  path_ext_remove() %>%
-  path_file() %>%
-  paste0(".dat") %>%
-  path(dest_dir, .)
-
-# faz download se o arquivo não existir
-if(!file_exists(dest_file)){
- download.file(dropbox_link, dest_file, mode = "wb")  
-}
-```
-
-```{r set-down-old, eval = FALSE, echo = FALSE}
-dropbox_link <- "https://www.dropbox.com/s/d40adhw66uwueet/VazoesNaturaisONS_D_87UHEsDirceuAssis_2018.dat?dl=1"
-
-# diretório de destino dentro do sub-diretório 'extdata' do pacote HEobs
-dest_dir <- system.file(package = "HEobs") %>%
-  path("inst/extdata")
 dir_create(dest_dir)
 #dir_exists(dest_dir)
 
@@ -212,7 +190,6 @@ str(qobs_posto)
 ```
 
 ```
-Show in New WindowClear OutputExpand/Collapse Output
 tibble [18,536 × 3] (S3: tbl_df/tbl/data.frame)
  $ date : Date[1:18536], format: "1968-04-02" ...
  $ posto: num [1:18536] 74 74 74 74 74 74 74 74 74 74 ...
@@ -239,19 +216,6 @@ et0_brick <- import_nc(
 )
 ```
 
-
-```{r meteo_raster-flux-old, eval = FALSE, include = FALSE}
-# lê arquivo de prec diária ou faz download se ele não estiver no dest_dir
-prec_brick <- import_nc(
-  varnc = "prec",
-  dest_dir = system.file("extdata", package = "fuse.prep")
-)
-et0_brick <- import_nc(
-  varnc = "et0",
-  dest_dir = system.file("extdata", package = "fuse.prep")
-)
-```
-
 A função `spatial_average()` determina a média da variável meteorológica sobre a área da BH. Os nomes padrões das variáveis no FUSE  são `pr` para precipitação e `pet` para evapotranspiração potencial. Por isso, usamos estes nomes no argumento `var_name` que armazenará o nome da variável que será escrita no NetCDF.  
 
 ```{r sp-avg, eval = FALSE}
@@ -264,6 +228,7 @@ prec_posto <- spatial_average(
 str(prec_posto)
 ```
 ```
+st_buffer does not correctly buffer longitude/latitude datatibble
 tibble [13,149 × 3] (S3: tbl_df/tbl/data.frame)
  $ date : Date[1:13149], format: "1980-01-01" ...
  $ posto: int [1:13149] 74 74 74 74 74 74 74 74 74 74 ...
@@ -281,6 +246,7 @@ str(pet_posto)
 ```
 
 ```
+st_buffer does not correctly buffer longitude/latitude data
 tibble [13,727 × 3] (S3: tbl_df/tbl/data.frame)
  $ date : Date[1:13727], format: "1980-01-01" ...
  $ posto: int [1:13727] 74 74 74 74 74 74 74 74 74 74 ...
@@ -304,6 +270,8 @@ str(meteo_data)
 ```
 
 ```
+q_obs has been converted to mm.
+output/meteo-data-posto-74.RDS
 tibble [13,149 × 6] (S3: tbl_df/tbl/data.frame)
  $ date   : Date[1:13149], format: "1980-01-01" ...
  $ station: num [1:13149] 74 74 74 74 74 74 74 74 74 74 ...
