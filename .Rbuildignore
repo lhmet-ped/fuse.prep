@@ -5,4 +5,5 @@
 ^README\.Rmd$
 ^data-raw/wc10$
 ^input$
+^output$
 ^codecov\.yml$
