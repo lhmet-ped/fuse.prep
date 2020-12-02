@@ -153,7 +153,7 @@ meteo_nc <- function(varnc, dest_dir  = "input") {
 #' if(FALSE) b_prec <- fuse.prep::import_nc(varnc = "prec", dest_dir = "input")
 #'
 import_nc <- function(varnc = c("prec", "et0"), dest_dir = "input"){
-  # varnc = "et0"
+  # varnc = "et0"; dest_dir = "input"
   checkmate::assert_choice(varnc, c("prec", "et0"))
 
   nc_file <- meteo_nc(varnc, dest_dir)

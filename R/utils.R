@@ -1,6 +1,7 @@
 utils::globalVariables(
   c(
     "qnat_posto",
+    "qnat",
     "codONS",
     "info",
     "nome",
