@@ -11,7 +11,8 @@
 #' @param dest_dir a character with the name of where the data is to be
 #' saved.
 #' @param prefix character, prefiz for the output file name.
-#' @return a \code{\link[tibble]{tibble}}
+#' @return a \code{\link[tibble]{tibble}}, column q_obs is the `qnat` variable
+#'  (input) expressed in mm (discharge).
 #' @export
 #'
 comb_data <- function(prec, et0, qobs, area,
@@ -19,6 +20,7 @@ comb_data <- function(prec, et0, qobs, area,
                       prefix = "hydrodata-posto-",
                       dest_dir = "output"
 ){
+  checkmate::assert_choice("qnat", names(qobs), )
  # prec = prec_posto; et0 = pet_posto; qobs = qobs_posto; area = area_posto; stn_id = 74
   hydrodata <- prec %>%
     dplyr::inner_join(et0, by = c("date", "posto")) %>%
@@ -27,20 +29,22 @@ comb_data <- function(prec, et0, qobs, area,
 
   hydrodata <- hydrodata %>%
   dplyr::mutate(
-    qobs_mm = convert_flow(
-      # mudar no HEobs o nome qnat para qobs
-      dplyr::pull(dplyr::select(., -date, -posto, -pr, -pet)),
+    q_obs = convert_flow(
+      # mudar no HEobs o nome qnat para q_obs
+      dplyr::pull(dplyr::select(qnat)),
       from = "m^3/sec",
       to = "mm/day",
       area.km2 = area
-    )
+    ),
+    qnat = NULL
   ) %>%
-    dplyr::rename("station" = "posto")
+    dplyr::rename("station" = posto)
+  message("q_obs has been converted to mm.")
 
   if(save){
     hydrodata_file <- save_data(hydrodata,
                                 .prefix = prefix,
-                                .posto_id = hydrodata$posto[1],
+                                .posto_id = hydrodata$station[1],
                                 .dest_dir = dest_dir
     )
     message(hydrodata_file)
@@ -55,19 +59,23 @@ comb_data <- function(prec, et0, qobs, area,
 #' @noRd
 #' @family forcings functions
 .check_inputs_meteo_forc <- function(variab_list, ctrd, file) {
-  # variab_list = forcdata74
-  meteo_data <- dplyr::select(variab_list, -date, -id)
+  # variab_list = meteo_data
+  checkmate::assert_choice("date", names(variab_list))
+  checkmate::assert_choice("station", names(variab_list))
+
+  # check for valid data
+  meteo_data <- dplyr::select(variab_list, -date, -station)
   met_vnames <- names(meteo_data)
   all_obs_miss <- apply(meteo_data, 2, function(x) all(is.na(x)))
   checkmate::assert_true(sum(all_obs_miss) == 0)
 
-  checkmate::assert_subset(met_vnames, all_variables())
-  checkmate::assert_choice("date", names(variab_list))
+  checkmate::assert_subset(all_variables(), met_vnames)
+
   #identical_lengths <- all(diff(unname(unlist(lapply(variab_list, length)))) == 0)
   #checkmate::assert_true(identical_lengths)
   checkmate::assert_subset(class(variab_list$date), c("Date", "POSIXct", "POSIXt"))
   checkmate::assert_class(ctrd, "data.frame")
-  checkmate::assert_subset(c("lon", "lat", "id"), names(ctrd))
+  checkmate::assert_subset(c("lon", "lat", "station"), names(ctrd))
   checkmate::assert_directory_exists(dirname(file))
   return(invisible(NULL))
 }
@@ -164,10 +172,8 @@ meteo_forcing_nc <- function(forc_tbl,
                              file_nc = "inst/extdata/74_input.nc",
                              na = -9999,
                              force_v4 = TRUE) {
-  # data_list <- forc_tbl
-  # data_list = list(pr= forcdata74$pr, pet = forcdata74$pet);
+  # forc_tbl = meteo_data
   # ccoords = centroids(poly_station = poly74); na = -9999; file_nc = "inst/extdata/74_input.nc"; force_v4 = TRUE
-  # forc_tbl = forcdata74
   var_names <- all_variables()[all_variables() %in% names(forc_tbl)]
 
   # check inputs

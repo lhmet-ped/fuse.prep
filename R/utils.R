@@ -26,6 +26,7 @@ utils::globalVariables(
 )
 
 
+
 .check_user <- function(user = "hidrometeorologista"){
   Sys.info()[["login"]] == user
 }
