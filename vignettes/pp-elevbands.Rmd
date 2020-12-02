@@ -121,8 +121,8 @@ A segunda base de dados é distribuída em [arquivos NetCDF](https://utexas.app.
 ```
 prec 
 "input/brick-prec-25km-19800101-20151231.nc" 
-                                                                              et0 
- "input//brick-ETo-25km-19800101-20170731.nc" 
+et0 
+"input/brick-ETo-25km-19800101-20170731.nc" 
 ```
 
 
