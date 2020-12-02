@@ -5,7 +5,7 @@ easypackages::libraries(c("dplyr", "fuse.prep", "HEgis", "raster"))
 
 forcdata74 <- readRDS("~/Dropbox/github/my_reps/lhmet/fusepoc-prep/output/hydrodata-posto-74.RDS")
 forcdata74 <- forcdata74 %>%
-  dplyr::select(date, id = posto, pr = prec, pet = et0, q_obs = qnat_mm) %>%
+  dplyr::select(date, station = posto, pr = prec, pet = et0, q_obs = qnat_mm) %>%
   tibble::as_tibble()
 
 
@@ -45,7 +45,7 @@ forcdata74 <-
 mutate(forcdata74, month = lubridate::month(date)) %>%
   full_join(clim_temp) %>%
   # manter a ordem das vars como nos dados de exemplo do fuse
-  dplyr::select(date:id, temp, pr, everything(), -month)
+  dplyr::select(date:station, temp, pr, everything(), -month)
 
 forcdata74
 
