@@ -1,6 +1,8 @@
-# fuse.prep (development version)
-
 - [ ] incluir testes para `spatial_average`, `annual_climatology`, `annual_summary`
+
+# fuse.prep 0.3.0
+
+- [x] fix https://github.com/lhmet-ped/fuse.prep/issues/4#issuecomment-736991500
 
 # fuse.prep 0.2.0
 

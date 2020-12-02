@@ -1,6 +1,6 @@
 Package: fuse.prep
 Title: Preparation Of Input Data For Fuse
-Version: 0.2.0.9000
+Version: 0.3.0
 Authors@R: 
     person(given = "Jônatan",
            family = "Tatsch",
@@ -12,7 +12,7 @@ License: MIT + file LICENSE
 URL: https://github.com/lhmet-ped/fuse.prep
 BugReports: https://github.com/lhmet-ped/fuse.prep/issues
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5.0)
 SystemRequirements: C++11, netcdf, udunits-2,
     GDAL (>= 2.0.1), GEOS (>= 3.4.0),
     PROJ (>= 4.8.0), unrar (>= 5.61) for Unix-alikes and 
