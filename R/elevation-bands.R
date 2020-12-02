@@ -308,6 +308,6 @@ centroids <- function(poly_station, ref_crs = "+proj=longlat +datum=WGS84"){
     sf::st_coordinates() %>%
     tibble::as_tibble() %>%
     dplyr::rename("lon" = X, "lat" = Y) %>%
-    dplyr::mutate(id = poly_station[["codONS"]])
+    dplyr::mutate(station = poly_station[["codONS"]])
   cll
 }

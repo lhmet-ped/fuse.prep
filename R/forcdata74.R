@@ -5,7 +5,7 @@
 #' @format A tibble with 13,149 daily observations, and 6 variables:
 #' \describe{
 #' \item{date}{date object, start 1980-01-01, end 2015-12-31}
-#' \item{id}{numeric vector, id of ONS station}
+#' \item{station}{numeric vector, id of ONS station}
 #' \item{temp}{numeric vector, monthly average temperature in °C}
 #' \item{pr}{numeric vector, precipitation in mm/day}
 #' \item{pet}{numeric vector, potential ET in mm/day}

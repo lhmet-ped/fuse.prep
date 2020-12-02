@@ -22,7 +22,8 @@ utils::globalVariables(
     "posto",
     "pr",
     "pet",
-    "id"
+    "id",
+    "station"
   )
 )
 

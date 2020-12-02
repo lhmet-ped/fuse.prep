@@ -20,7 +20,7 @@ comb_data <- function(prec, et0, qobs, area,
                       prefix = "hydrodata-posto-",
                       dest_dir = "output"
 ){
-  checkmate::assert_choice("qnat", names(qobs), )
+  checkmate::assert_choice("qnat", names(qobs))
  # prec = prec_posto; et0 = pet_posto; qobs = qobs_posto; area = area_posto; stn_id = 74
   hydrodata <- prec %>%
     dplyr::inner_join(et0, by = c("date", "posto")) %>%
@@ -31,10 +31,10 @@ comb_data <- function(prec, et0, qobs, area,
   dplyr::mutate(
     q_obs = convert_flow(
       # mudar no HEobs o nome qnat para q_obs
-      dplyr::pull(dplyr::select(qnat)),
+      qnat,
       from = "m^3/sec",
       to = "mm/day",
-      area.km2 = area
+      area.km2 = area[1]
     ),
     qnat = NULL
   ) %>%
@@ -44,7 +44,7 @@ comb_data <- function(prec, et0, qobs, area,
   if(save){
     hydrodata_file <- save_data(hydrodata,
                                 .prefix = prefix,
-                                .posto_id = hydrodata$station[1],
+                                .posto_id = hydrodata[["station"]][1],
                                 .dest_dir = dest_dir
     )
     message(hydrodata_file)
@@ -69,7 +69,7 @@ comb_data <- function(prec, et0, qobs, area,
   all_obs_miss <- apply(meteo_data, 2, function(x) all(is.na(x)))
   checkmate::assert_true(sum(all_obs_miss) == 0)
 
-  checkmate::assert_subset(all_variables(), met_vnames)
+  checkmate::assert_subset(met_vnames, all_variables())
 
   #identical_lengths <- all(diff(unname(unlist(lapply(variab_list, length)))) == 0)
   #checkmate::assert_true(identical_lengths)
