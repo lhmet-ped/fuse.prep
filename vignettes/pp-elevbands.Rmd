@@ -242,11 +242,23 @@ para o posto 74, usando 14 bandas de elevação usando o código:
 
 ```{r dest-nc-eb, eval = FALSE}
 # altere aqui se desejar
-dest_eb_file <- "output/posto74_elevation_bands.nc" 
+suffix <- paste0("posto", poly_posto$codONS)
+dest_dir <- "output"
+elev_bands_ncname <- file.path(
+  dest_dir, 
+  paste(suffix, "elev_bands.nc", sep = "_")
+)
+elev_bands_ncname
 ```
 
 ```{r dest-nc-eb-actual, echo = FALSE}
-dest_eb_file <- file.path(tmpDir(), "posto74_elevation_bands.nc")
+suffix <- paste0("posto", poly_posto$codONS)
+dest_dir <- tempdir()
+elev_bands_ncname <- file.path(
+  dest_dir, 
+  paste(suffix, "elev_bands.nc", sep = "_")
+)
+print("output/posto74_elev_bands.nc")
 ```
 
 ```{r, eval = FALSE}
@@ -256,7 +268,7 @@ elev_bands_file <- elev_bands_nc(
   dz = NULL,
   nbands = 14,
   ccoords,
-  file_nc = dest_eb_file,
+  file_nc = elev_bands_ncname,
   na = -9999,
   force_v4 = TRUE,
   quiet = TRUE
@@ -267,10 +279,8 @@ elev_bands_file <- elev_bands_nc(
 elev_bands_file
 ```
 
-
-
 ```{r, echo = FALSE}
-(dest_eb_file <- "output/posto74_elevation_bands.nc")
+print("output/posto74_elev_bands.nc")
 ```
 
 Para detalhes sobre a função `elev_bands_nc()` consulte o help (`?elev_bands_nc`).

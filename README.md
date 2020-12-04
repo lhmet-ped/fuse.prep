@@ -128,35 +128,49 @@ Para saber como estes 3 arquivos foram gerados consulte a vinheta de
 `vignette('pp-elevbands', package = "fuse.prep")`.
 
 O arquivo NetCDF de bandas de elevação é gerado com a função
-`elev_bands_nc()` que requer como entrada os dados carregados acima e o
-centróide do polígono. O centróide do polígono da bacia hidrográfica é
-obtido com a função `centroids()`.
+`elev_bands_ncname()` que requer como entrada os dados carregados acima
+e o centróide do polígono. O centróide do polígono da bacia hidrográfica
+é obtido com a função `centroids()`.
 
 ``` r
 (poly_ctrd <- centroids(poly_station = poly74))
 #> # A tibble: 1 x 3
-#>     lon   lat id   
-#>   <dbl> <dbl> <chr>
+#>     lon   lat station
+#>   <dbl> <dbl> <chr>  
 #> 1 -50.3 -26.0 74
 ```
 
+Para gerar o arquivo precisamos definir onde ele será salvo.
+
 ``` r
 # arquivo de saída - altere o caminho para o local desejado
- elevbands_nc <- file.path(tempdir(), "posto74_elevation_bands.nc")
+# nome do arquivo netcdf: 'suffix_elev_bands.nc'
+(suffix <- paste0("posto", poly74$codONS))
+#> [1] "posto74"
+dest_dir <- tempdir()
+elev_bands_ncname <- file.path(
+  dest_dir, 
+  paste(suffix, "elev_bands.nc", sep = "_")
+)
+```
 
+Agora temos os dados de entrada para função `elev_bands_ncname()` gerar
+o arquivo NetCDF.
+
+``` r
 elev_bands_file <- elev_bands_nc(
   con_dem = condem74, 
   meteo_raster = precclim74, 
   nbands = 14,
   ccoords = poly_ctrd,
-  file_nc = elevbands_nc,
+  file_nc = elev_bands_ncname,
   na = -9999
 )
 #>   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================================                  |  75%  |                                                                              |======================================================================| 100%
 #> 
 #>   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%
 elev_bands_file
-#> [1] "/tmp/RtmpuvUSzW/posto74_elevation_bands.nc"
+#> [1] "/tmp/Rtmp5UUq7h/posto74_elev_bands.nc"
 file.exists(elev_bands_file)
 #> [1] TRUE
 ```
@@ -170,12 +184,12 @@ dados `forcdata74` disponibilizado com este pacote.
 ``` r
 str(forcdata74)
 #> tibble [13,149 × 6] (S3: tbl_df/tbl/data.frame)
-#>  $ date : Date[1:13149], format: "1980-01-01" "1980-01-02" ...
-#>  $ id   : num [1:13149] 74 74 74 74 74 74 74 74 74 74 ...
-#>  $ temp : num [1:13149] 20.6 20.6 20.6 20.6 20.6 ...
-#>  $ pr   : num [1:13149] 0.3635 0.2136 0.169 0.226 0.0616 ...
-#>  $ pet  : num [1:13149] 5.37 5.01 5.38 5.53 5.51 ...
-#>  $ q_obs: num [1:13149] 1.81 1.64 1.43 1.34 1.22 ...
+#>  $ date   : Date[1:13149], format: "1980-01-01" "1980-01-02" ...
+#>  $ station: num [1:13149] 74 74 74 74 74 74 74 74 74 74 ...
+#>  $ temp   : num [1:13149] 20.6 20.6 20.6 20.6 20.6 ...
+#>  $ pr     : num [1:13149] 0.3635 0.2136 0.169 0.226 0.0616 ...
+#>  $ pet    : num [1:13149] 5.37 5.01 5.38 5.53 5.51 ...
+#>  $ q_obs  : num [1:13149] 1.81 1.64 1.43 1.34 1.22 ...
 ```
 
 Para saber como gerar estes dados consulte a vinheta de
@@ -190,14 +204,17 @@ bacia hidrográfica do posto e o arquivo NetCDF que será salvo.
 
 ``` r
 # arquivo de saída - altere o caminho para o local desejado
-forcings_nc <- "inst/extdata/posto74_input.nc"
+forcings_ncname <- file.path(
+  dest_dir, 
+  paste(suffix, "input.nc", sep = "_")
+)
 # exporta dados para netcdf
 meteo_forcing_nc(
   forc_tbl = forcdata74,
   ccoords = centroids(poly_station = poly74),
-  file_nc = forcings_nc 
+  file_nc = forcings_ncname 
 )
-#> [1] "inst/extdata/posto74_input.nc"
-file.exists(forcings_nc)
+#> [1] "/tmp/Rtmp5UUq7h/posto74_input.nc"
+file.exists(forcings_ncname)
 #> [1] TRUE
 ```

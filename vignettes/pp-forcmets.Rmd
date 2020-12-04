@@ -286,20 +286,37 @@ tibble [13,149 × 6] (S3: tbl_df/tbl/data.frame)
 
 Os dados `meteo_data` são usados como entrada função `meteo_forcing_nc()`. Então podemos gerar o arquivo NetCDF das forçantes meteorológicas para o posto 74, passando cada coluna daqueles dados, além das coordenadas do centróide da BH:
 
+```{r ncname-true, echo = FALSE}
+suffix <- paste0("posto", poly_posto$codONS)
+dest_dir <- tempdir()
+forcings_ncname <- file.path(
+  dest_dir, 
+  paste(suffix, "input.nc", sep = "_")
+)
+```
+
+```{r ncname-fake, eval = FALSE, echo = TRUE}
+dest_dir <- "output"
+forcings_ncname <- file.path(
+  dest_dir, 
+  paste(suffix, "input.nc", sep = "_")
+)
+```
+
+
+
 ```{r write-forcs, eval = FALSE}
-# arquivo de saída
-forcings_nc <- path("output", "posto74_input.nc")
 # exporta dados para netcdf
 meteo_forcing_nc(
   forc_tbl = meteo_data,
   ccoords = centroids(poly_station = poly_posto),
-  file_nc = forcings_nc 
+  file_nc = forcings_ncname 
 )
-file.exists(forcings_nc)
+file.exists(forcings_ncname)
 ```
 
 ```
-"./input/posto74_input.nc"
+"./output/posto74_input.nc"
 [1] TRUE
 ```
 

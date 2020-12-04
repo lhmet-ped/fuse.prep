@@ -90,45 +90,56 @@ precclim74
 
 Para saber como estes 3 arquivos foram gerados consulte a vinheta de *Pré-processamento dos dados de bandas de elevação* digitando `vignette('pp-elevbands', package = "fuse.prep")`.
 
-O arquivo NetCDF de bandas de elevação é gerado com a função `elev_bands_nc()`
+O arquivo NetCDF de bandas de elevação é gerado com a função `elev_bands_ncname()`
 que requer como entrada os dados carregados acima e o centróide do polígono. O centróide do polígono da bacia hidrográfica é obtido com a função `centroids()`.
 
 
 ```{r centroids}
 (poly_ctrd <- centroids(poly_station = poly74))
 ```
+Para gerar o arquivo precisamos definir onde ele será salvo.
+
+```{r file_elev_bands}
+# arquivo de saída - altere o caminho para o local desejado
+# nome do arquivo netcdf: 'suffix_elev_bands.nc'
+(suffix <- paste0("posto", poly74$codONS))
+dest_dir <- tempdir()
+elev_bands_ncname <- file.path(
+  dest_dir, 
+  paste(suffix, "elev_bands.nc", sep = "_")
+)
+```
+
+Agora temos os dados de entrada para função `elev_bands_ncname()` gerar o arquivo NetCDF.
 
 ```{r elev_tab}
-# arquivo de saída - altere o caminho para o local desejado
- elevbands_nc <- file.path(tempdir(), "posto74_elevation_bands.nc")
-
 elev_bands_file <- elev_bands_nc(
   con_dem = condem74, 
   meteo_raster = precclim74, 
   nbands = 14,
   ccoords = poly_ctrd,
-  file_nc = elevbands_nc,
+  file_nc = elev_bands_ncname,
   na = -9999
 )
 elev_bands_file
 file.exists(elev_bands_file)
 ```
 
-```{r, include = FALSE}
+```{r, include = FALSE, eval = FALSE}
 #Verificação do arquivo gerado.
 if (requireNamespace("tidync", quietly = TRUE)) {
   library(tidync)
   out <- tidync(elev_bands_file) %>% 
     hyper_tibble()
   # compara arquivo de exemplo do FUSE
-  ref <- tidync::tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_elev_bands.nc") %>% tidync::hyper_tibble()
+  ref <- tidync::tidync("/home/hidrometeorologista/Desktop/fuse-poc-sim/fuse_catch/input/us_09066300_elev_bands.nc") %>% tidync::hyper_tibble()
 }
 
 out
 ```
 
 ```{r, include = FALSE}
-ref <- tidync::tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_input.nc") %>% tidync::hyper_tibble()
+ref <- tidync::tidync("/home/hidrometeorologista/Desktop/fuse-poc-sim/fuse_catch/input/us_09066300_input.nc") %>% tidync::hyper_tibble()
 ref
 names(ref)
 ```
@@ -148,22 +159,25 @@ Cada variável é passada como um vetor conforme código abaixo. Os nomes dos ve
 
 ```{r}
 # arquivo de saída - altere o caminho para o local desejado
-forcings_nc <- "inst/extdata/posto74_input.nc"
+forcings_ncname <- file.path(
+  dest_dir, 
+  paste(suffix, "input.nc", sep = "_")
+)
 # exporta dados para netcdf
 meteo_forcing_nc(
   forc_tbl = forcdata74,
   ccoords = centroids(poly_station = poly74),
-  file_nc = forcings_nc 
+  file_nc = forcings_ncname 
 )
-file.exists(forcings_nc)
+file.exists(forcings_ncname)
 ```
 
 ```{r verif-forcings, include = FALSE}
 library(tidync)
-forcing_file <- "inst/extdata/posto74_input.nc"
+forcing_file <- forcings_ncname
 out <- tidync(forcing_file) %>% hyper_tibble()
 # compara arquivo de exemplo do FUSE
-ref <- tidync("~/Dropbox/github/my_reps/lhmet/HEgis/refs/fuse_catch/input/us_09066300_input.nc") %>% 
+ref <- tidync("/home/hidrometeorologista/Desktop/fuse-poc-sim/fuse_catch/input/us_09066300_input.nc") %>% 
   hyper_tibble()
 out
 ref
